@@ -1,0 +1,9 @@
+\begin{abstract}
+
+To deploy the convolutional neural network (CNN) applications faster and more efficiently, a variety of accelerator architectures for inference have been studied and designed. But little design work is done to speed up the training phase. GPU because of its high bandwidth and high parallelism features, has become the mainstream training platform. Recently, pruning and quantization algorithms are considered to be effective in minimizing the overhead of the large model of neural network, and accelerating the inference phase. This also brings acceleration potential for CNN training. 
+
+But accelerating CNN training is still hard. On one hand, current work focuses on training an efficient network rather than efficiently training a network. The training phase is still not hardware friendly enough. On the other hand, the difference between inference phase and back propagation phase in training brings more challenges to hardware design. Existing designs are hard to support training efficiently and utilize sparse property in training.
+
+In this paper, we propose an efficient CNN training method with both software optimization and hardware architecture design. A hardware friendly network training method is proposed with all-fixed-point-data computation and sparse network parameters. An FPGA based architecture is designed to accelerate this training process. Proposed hardware achieves 641GOP/s equivalent performance and 3x better energy efficiency compared with GPU. 
+
+\end{abstract}

@@ -1,0 +1,93 @@
+\section{Hardware Friendly Training}\label{sec:training}
+
+We first introduce two hardware-friendly training methods: fixed-point training and structured sparsity, followed by validating these methods on the real dataset.
+
+\subsection{Fixed-point Data Based Training}
+Traditional CNN training relies on full-precision data, i.e. 32-bit floating point data, to guarantee a good training accuracy. However, using fixed-point data in training process can help increase the energy efficiency of training. For CNN inference, varies accelerators have been proposed with fixed point operations to increase energy efficiency. For training, using fixed point data usually suffers great model accuracy loss. Recent work~\cite{Zhou2016DoReFa} use narrow bit-width only for data storage in training process but have to convert the data to floating point to process addition and multiplication. In this paper, we propose a training process using both fixed point format for data storage and computation. 
+
+In the proposed training process, every fixed-point number is represented with low bit-width (e.g. 8 bit in our implementation) together with a scaling factor. We keep a common scale for each fixed-point blob, where a blob can be the activation of a layer, the weights of a layer, or the gradients of the weights/activations of a layer. Using this data format naively will induce two problems.
+
+The first problem is how to convert the original floating point data to the fixed point version. This means to decide the scaling factor for each data blob. One choice is to use the dynamic range of each blob as the scaling factor can keep the data precision to the best degree, but this brings extra statistic and normalization operations for each data blob in each iteration. In this work, we focus on fine-tuning a pruned network. 
+% \SH{don't let reviewers have the impression that you're bypassing the hardcore problem by fine-tuning.}
+So we execute floating-point training iterations to analyze the dynamic scale of each blob and keep the scale through the rest of training process. Furthermore, we choose the nearest $2^n$ as the scaling factor which means data normalization can be implemented with shift operations on fixed-point data.
+
+The second problem is the trade-off between bit-width and training accuracy. Low bit-width simplifies operations and reduce the storage consumption, but also reduce the model accuracy. For CNN training, the update step in each iteration is usually small because of small learning rate and gradient vanishing. Thus the update step is easy to underflow if using fixed point data with narrow bit-width.  In this work, we use narrow bit-width for activations and gradients. Because the scaling factor of gradient blob can be much smaller than that of weights, we use a larger bit-width to avoid gradient underflow when the gradients and weights are to be aligned and added together. To reduce the hardware cost for each operation, we only use the MSBs of weights to execute feed forward and back propagation.
+
+An example of the proposed fixed-point based training process is shown in Figure~\ref{fig:train_fixed}. The right part of the figure shows the feed forward phase of the network from top to bottom while the left part shows the back propagation phase from bottom to top. The learning rate is merged with the scaling factor and converted to shift operation before computing $\Delta W$ and $\Delta B$. Currently, weight decay and momentum are not supported in our hardware design. So we also omit these two functions in our software experiments. These two functions will not greatly affect hardware design and are to be supported in the future.
+
+\begin{figure}[tb]
+  \centering 
+  \includegraphics[width=1.0\columnwidth]{figures/train_fixed.pdf}
+  \caption{An example of the proposed training process with 8-bit for neuron and weight MSB and 24bit for weight LSB buffer. }
+  \label{fig:train_fixed}
+\end{figure}
+
+\subsection{Structured Pruning}
+
+We denote shape of weights as $(N, C, H, W)$. $N$ represents output channel, $C$ represents input channel, $H$ represents height, and $W$ represents weight. Compared to element-wise pruning, group-wise pruning is more efficient for hardware to realize. We choose kernel-dim pruning, which means the atomic elements during pruning is $H \times W$. L2-norm of the atomic elements is calculated, and atomic elements with small l2-norm are pruned. Mask matrix is used to label where is pruned and has the same shape as weights. If the weight is pruned, its mask becomes 0. Then we get sparse weights and mask matrix. 
+
+\begin{figure}[tb]
+    \centering\includegraphics[width=3.5in]{figures/prune-light.pdf}
+    \caption{Illustration of the group-wise pruning}\label{fig:prune}
+\end{figure}
+
+\begin{table}[tb]
+\centering
+\caption{Structure of the neural network for the experiment. Sparsity denotes the ration of zeros element or convolution kernel in a layer.}
+\label{table:sparsity}
+\begin{tabular}{|c|c|c|c|}
+\hline
+Layer    & Type                                                  & \begin{tabular}[c]{@{}c@{}}Dimenson\\ (NxCxHxW)\end{tabular} & Sparsity \\ \hline
+conv1    & conv                                                  & 64x3x3x3                                                   & 0.1      \\ \hline
+pool1    & \begin{tabular}[c]{@{}c@{}}max\\ pooling\end{tabular} & -                                                            & -        \\ \hline
+conv2    & conv                                                  & 128x64x3x3                                                   & 0.4      \\ \hline
+pool2    & \begin{tabular}[c]{@{}c@{}}max\\ pooling\end{tabular} & -                                                            & -        \\ \hline
+conv3\_1 & conv                                                  & 256x128x3x3                                                  & 0.3      \\ \hline
+conv3\_2 & conv                                                  & 256x256x3x3                                                  & 0.4      \\ \hline
+pool3    & \begin{tabular}[c]{@{}c@{}}max\\ pooling\end{tabular} & -                                                            & -        \\ \hline
+conv4\_1 & conv                                                  & 512x256x3x3                                                  & 0.5      \\ \hline
+conv4\_2 & conv                                                  & 512x512x3x3                                                  & 0.7      \\ \hline
+pool4    & \begin{tabular}[c]{@{}c@{}}max\\ pooling\end{tabular} & -                                                            & -        \\ \hline
+conv5\_1 & conv                                                  & 512x512x3x3                                                  & 0.9      \\ \hline
+conv5\_2 & conv                                                  & 512x512x3x3                                                  & 0.9      \\ \hline
+pool5    & \begin{tabular}[c]{@{}c@{}}max\\ pooling\end{tabular} & -                                                            & -        \\ \hline
+dense6   & fc                                                    & 512x512                                                      & 0.9      \\ \hline
+dense7   & fc                                                    & 512x512                                                      & 0.9      \\ \hline
+dense8   & fc                                                    & 512x10                                                   & 0.9          \\ \hline 
+\end{tabular}
+\end{table}
+
+
+\subsection{Software Validation}
+
+The whole training process used in this work is as follows:
+\begin{itemize}
+\item Training a fixed-point model with fixed-point weights and activations using full-precision gradients on software.
+\item Pruning weights and getting the mask matrix.
+\item Training a fixed-point model on hardware using fixed-point gradients while keeping pruned weights zero.
+\end{itemize}
+
+The first two steps are implemented with software which use CPU and GPU as the computation platform. The third step can be executed with the proposed hardware architecture. To test the performance of the fixed-point based training method, we implemented a software version of the fixed-point data based CONV, ReLU, and pooling layers on TensorFlow.
+
+In our implementation, the bit width of the weight buffer is set to be 24bit. The fixed scale of every gradient accumulation buffer is decided using the weight scale, the gradient scale and the learning rate after the first step. In this fine-tune stage, the fixed scales for every weight/activation/gradient blobs are fixed, and no momentum or weight decay is used. This ensures that every detail will be the same as the hardware implementation.
+
+We perform the experiment using VGG-11\cite{Simonyan2014Very} on CIFAR-10\cite{krizhevsky2009learning} dataset. While training in the first step, the learning rate is set to 0.05 and decayed by 0.5 every 30 epochs; weight decay is set to $5 \times 10^{-4}$ and momentum is set to 0.9. We pruned model to the same sparsity in the whole experiments shown in Table~\ref{table:sparsity}. In the third training step with fixed point data, we compare the result of training with and without momentum. The accuracy is nearly the same(90.54 vs. 90.53). 
+
+Furthermore, we also evaluate where is a good point to stop floating point training and starts fixed point training with pruned weights. Usually, we prune model when it is perfectly trained and achieves the best accuracy. But if we want to save the training time, we do not need to prune model until it perfectly trained. Table~\ref{table:prune} shows experimental results for pruning at different training stages. 
+
+\begin{table}[tb]
+\centering
+\caption{Comparison of training result with different number of initial epochs before training}
+\label{table:prune}
+\begin{tabular}{ccccc}
+\hline
+\begin{tabular}[c]{@{}c@{}}Initial\\ accuracy\end{tabular} & \begin{tabular}[c]{@{}c@{}}Initial\\ epochs\end{tabular} & \begin{tabular}[c]{@{}c@{}}Fine-tune\\ Accuracy\end{tabular} & \begin{tabular}[c]{@{}c@{}}Fine-tune\\ epoches\end{tabular} & \begin{tabular}[c]{@{}c@{}}Total\\ epoches\end{tabular} \\ \hline
+90.98                                                      & 220                                                       & 90.81                                                        & 100                                                         & 320                                                     \\
+90.05                                                      & 130                                                       & 91.11                                                        & 200                                                          & 330                                                     \\
+89.58                                                      & 100                                                        & 91.01                                                        & 195                                                         & 295                                                     \\
+88.06                                                      & 65                                                        & 90.54                                                        & 130                                                         & 195                                                     \\
+85.50                                                      & 45                                                        & 90.05                                                        & 115                                                         & 160                                                     \\\hline
+\end{tabular}
+\end{table}
+
+The result in Table~\ref{table:prune} shows that, if we start pruning at half of training, it may cost less epochs without harming accuracy, even with small accuracy improvement. The best accuracy occurred having 130 epochs of dense training and 200 epochs of sparse training. The stopping criteria is when the learning curve starts to flatten. In this training task, 200 out of 330 epochs can be accelerated with hardware.
