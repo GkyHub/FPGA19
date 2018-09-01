@@ -32,6 +32,11 @@
 
 ### Hardware Design
 
+1. System structure
+2. sparse kernel
+3. compressed sparse block
+4. Scheduling*
+
 ### Experiments
 
 1. Training result
