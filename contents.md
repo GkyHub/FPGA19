@@ -2,7 +2,8 @@
 
 1. Deep Neural Network is good
 2. Training Deep Neural Network needs good performance and energy efficiency
-3. Previous work didn't focus on this part.
+3. Previous work focus on inference. We can take their ideas to training
+4. But we are faced with challenges.
 4. We propose a new training method and corresponding architecture
 
 ### Introduction
