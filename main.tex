@@ -1,188 +1,43 @@
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% This is the template for submission to ISCA 2018
-% The cls file is a modified from  'sig-alternate.cls'
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\documentclass[sigconf]{acmart}
 
-\documentclass{sig-alternate} 
-\usepackage{mathptmx} % This is Times font
-
-\newcommand{\ignore}[1]{}
-\usepackage{fancyhdr}
-\usepackage[normalem]{ulem}
-\usepackage[hyphens]{url}
-\usepackage{microtype}
-
-% Always include hyperref last
-\usepackage[bookmarks=true,breaklinks=true,letterpaper=true,colorlinks,linkcolor=black,citecolor=blue,urlcolor=black]{hyperref}
-
-% Ensure letter paper
-\pdfpagewidth=8.5in
-\pdfpageheight=11in
-
-
-%%%%%%%%%%%---SETME-----%%%%%%%%%%%%%
-\newcommand{\iscasubmissionnumber}{380}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\fancypagestyle{firstpage}{
-  \fancyhf{}
-\setlength{\headheight}{50pt}
-\renewcommand{\headrulewidth}{0pt}
-  \fancyhead[C]{\normalsize{ISCA 2018 Submission
-      \textbf{\#\iscasubmissionnumber} \\ Confidential Draft: DO NOT DISTRIBUTE}} 
-  \pagenumbering{arabic}
-}
-
-\usepackage{amsmath,amsfonts,amssymb}
-\usepackage{graphicx}
-\usepackage{subfigure}
+\usepackage{booktabs} % For formal tables
+\usepackage{cleveref}
+\usepackage{epsfig}
+\usepackage{float}
+\usepackage{amsmath,amssymb,amsfonts}
 \usepackage{algorithm}
-\usepackage{algorithmicx}
-\usepackage{algpseudocode}
-\usepackage{caption}
-\usepackage{multirow}
-\usepackage{textcomp,booktabs}
-\usepackage[usenames,dvipsnames]{color}
-\usepackage{colortbl}
-\usepackage{indentfirst}
-\usepackage{url}
-\usepackage{cite}
-% \usepackage{bibspacing}
+\usepackage[noend]{algpseudocode}
+\usepackage{bigstrut,multirow}
 \usepackage{threeparttable}
-\usepackage{bigstrut}
-
-
-\usepackage{blindtext, graphicx}
-\usepackage{epsfig}
-\usepackage{syntonly}
-\usepackage{rotating}
-\usepackage{amsmath}
-\usepackage{setspace}
-\usepackage{verbatim} 
-\usepackage{amssymb}
-\usepackage{amsmath}
-\setcounter{tocdepth}{3}
-\usepackage{graphicx}
-\usepackage{multirow}
-\usepackage{colortbl}
-\usepackage{enumerate}
-\usepackage{color}
-\usepackage{wrapfig}
-
-%\usepackage[noend]{algorithm2e}
-\usepackage{cleveref}
-\usepackage{comment}
-\usepackage{ifthen}
-\usepackage[dotinlabels]{titletoc}
-\usepackage{colortbl}
-\usepackage{array}
-\usepackage{alltt}
-\usepackage{bm}
-\renewcommand{\ttdefault}{txtt}
-\usepackage[normalem]{ulem}
-
-
-% \usepackage{mathptmx} % This is Times font
-\pdfoutput=1 %for posting to arXiv
-\usepackage{blindtext, graphicx}
-\usepackage{epsfig}
-\usepackage{syntonly}
-\usepackage{rotating}
-\usepackage{amsmath}
-\usepackage{setspace}
-\usepackage{verbatim} 
-\usepackage{amssymb}
-\usepackage{amsmath}
-\setcounter{tocdepth}{3}
-\usepackage{graphicx}
-\usepackage{multirow}
-\usepackage{colortbl}
-\usepackage{enumerate}
-\usepackage{color}
-\usepackage{wrapfig}
-\usepackage{cleveref}
-\usepackage{comment}
-\usepackage{ifthen}
-\usepackage[dotinlabels]{titletoc}
-\usepackage{colortbl}
-\usepackage{array}
-
-\usepackage{alltt}
-\usepackage{bm}
-\usepackage{longtable,booktabs}
+\usepackage{subfigure}
 \usepackage{url}
-\usepackage{courier}
-\usepackage{cite}
 
+%\input{copyright.tex}
 
-\usepackage{tabularx}
-\usepackage{footnote}
-
-\newcommand{\SH}[1]{{\color{blue}{}\textbf{}{}}}
-\newcommand{\YW}[1]{{\color{blue}{}\textbf{}{}}}
-
-% \newcommand{\SH}[1]{{\color{blue}{[}\textbf{SH: #1}{]}}}
-% \newcommand{\YH}[1]{{\color{blue}{[}\textbf{YW: #1}{]}}}
-
-
-
-
-
-\usepackage{colortbl}
-%\usepackage[justification=centering]{caption}
-\usepackage{threeparttable}
-\usepackage[free-standing-units]{siunitx}
-
-\usepackage{listings}
-\usepackage[usenames,dvipsnames]{xcolor}
-\lstset{
-language=C++,
-basicstyle=\small,
-numbers=left,
-columns=flexible,
-numbersep=5pt,
-breaklines=true,
-escapeinside= ``,
-xleftmargin=20pt,
-frame=tb,
-framexleftmargin=20pt
-}
-\newcommand{\rev}[1]{\textcolor{blue}{{}#1}}
-\renewcommand*\thelstnumber{\arabic{lstnumber}:}
-\DeclareCaptionFormat{mylst}{\hrule#1#2#3}
-\captionsetup[lstlisting]{format=mylst,labelfont=bf,singlelinecheck=off,labelsep=space}
-
-%%%%%%%%%%%---SETME-----%%%%%%%%%%%%%
-\title{Efficient Training Engine for Convolutional Neural Network with Structured Sparsity} 
-\author{}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% These commands are optional
+%\acmBooktitle{Transactions of the ACM Woodstock conference}
+%\editor{Jennifer B. Sartor}
+%\editor{Theo D'Hondt}
+%\editor{Wolfgang De Meuter}
 
 \begin{document}
-\maketitle
-\thispagestyle{firstpage}
-\pagestyle{plain}
+\title{SIG Proceedings Paper in LaTeX Format}
+
+%\input{authors.tex}
 
 \input{text/abstract.tex}
 
+%\input{CCSXML.tex}
+
+\keywords{FPGA, Convolutional Neural Network, Training}
+
+\maketitle
+
 \input{text/1-introduction.tex}
 
-\input{text/2-preliminary.tex}
+%\input{text/2-preliminary.tex}
 
-\input{text/3-training_process.tex}
-
-\input{text/4-hardware.tex}
-
-\input{text/5-experiment.tex}
-
-\input{text/6-related_work.tex}
-
-\input{text/7-conclusion.tex}
-
-%%%%%%% -- PAPER CONTENT ENDS -- %%%%%%%%
-
-%%%%%%%%% -- BIB STYLE AND FILE -- %%%%%%%%
-\bibliographystyle{ieeetr}
+\bibliographystyle{ACM-Reference-Format}
 \bibliography{ref}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \end{document}
