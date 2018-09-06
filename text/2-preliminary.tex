@@ -1,6 +1,8 @@
 \section{Preliminary}\label{sec:preliminary}
 
 \subsection{Training Process of CNN}
+Training of neural network is usually done with stochastic gradient descent. The training process consists of two alternate phases: forward(F) and back-propagation(BP). The forward phase randomly select a batch of training inputs and calculates their inference result with the current model. The backward phase first calculates the error between the inference result and the supervise data of corresponding inputs. Then the error is back-propagated through the network to calculate the gradient of the error to the weights.  
+
 Training of CNN consists of two phases: feed forward (FF) and back propagation. Back propagation phase also consists two steps: calculating neuron gradients (NG) and weight gradients (WG). In this section, we introduce the computation of these three phases for training CNN.\Cref{tab:Notations} summarizes the symbols we use to explain CNN.
 
 \begin{table}[htbp]
