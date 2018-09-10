@@ -31,32 +31,7 @@ We denote shape of weights as $(N, C, H, W)$. $N$ represents output channel, $C$
     \caption{Illustration of the group-wise pruning}\label{fig:prune}
 \end{figure}
 
-\begin{table}[tb]
-\centering
-\caption{Structure of the neural network for the experiment. Sparsity denotes the ration of zeros element or convolution kernel in a layer.}
-\label{table:sparsity}
-\begin{tabular}{|c|c|c|c|}
-\hline
-Layer    & Type                                                  & \begin{tabular}[c]{@{}c@{}}Dimenson\\ (NxCxHxW)\end{tabular} & Sparsity \\ \hline
-conv1    & conv                                                  & 64x3x3x3                                                   & 0.1      \\ \hline
-pool1    & \begin{tabular}[c]{@{}c@{}}max\\ pooling\end{tabular} & -                                                            & -        \\ \hline
-conv2    & conv                                                  & 128x64x3x3                                                   & 0.4      \\ \hline
-pool2    & \begin{tabular}[c]{@{}c@{}}max\\ pooling\end{tabular} & -                                                            & -        \\ \hline
-conv3\_1 & conv                                                  & 256x128x3x3                                                  & 0.3      \\ \hline
-conv3\_2 & conv                                                  & 256x256x3x3                                                  & 0.4      \\ \hline
-pool3    & \begin{tabular}[c]{@{}c@{}}max\\ pooling\end{tabular} & -                                                            & -        \\ \hline
-conv4\_1 & conv                                                  & 512x256x3x3                                                  & 0.5      \\ \hline
-conv4\_2 & conv                                                  & 512x512x3x3                                                  & 0.7      \\ \hline
-pool4    & \begin{tabular}[c]{@{}c@{}}max\\ pooling\end{tabular} & -                                                            & -        \\ \hline
-conv5\_1 & conv                                                  & 512x512x3x3                                                  & 0.9      \\ \hline
-conv5\_2 & conv                                                  & 512x512x3x3                                                  & 0.9      \\ \hline
-pool5    & \begin{tabular}[c]{@{}c@{}}max\\ pooling\end{tabular} & -                                                            & -        \\ \hline
-dense6   & fc                                                    & 512x512                                                      & 0.9      \\ \hline
-dense7   & fc                                                    & 512x512                                                      & 0.9      \\ \hline
-dense8   & fc                                                    & 512x10                                                   & 0.9          \\ \hline 
-\end{tabular}
-\end{table}
-
+\input{tables/cifar_model.tex}
 
 \subsection{Software Validation}
 
