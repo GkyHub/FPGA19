@@ -4,7 +4,9 @@ Before introducing the process of CNN training, we first claim the symbols used 
 \input{tables/symbol.tex}
 
 \subsection{Training Flow of CNN}
-Training of neural network is usually done with stochastic gradient descent. An example flow is shown in Figure~\ref{fig:train_prelim} The training process consists of two alternate phases: forward phase(FP) and back-propagation(BP). The forward phase randomly select a batch of training inputs and calculates their inference result with the current model. The back-propagation phase calculates the gradient of error to the weights in each layer according to the chain rule and update the weights by gradient descent. We further separate this phase into 2 phases: error back-propagation (EB) phase calculates the gradient of error, $\partial E/\partial y_i$ to the output of each layer; weight gradient (WG) phase calculates the gradient of weights $\partial E/\partial W_i$ in each layer and update the weights. One trains a CNN by iteratively conduct FP and BP until the weights converge.
+Training of neural network is usually done with stochastic gradient descent. An example flow is shown in Figure~\ref{fig:train_prelim} The training process consists of two alternate phases: forward phase(FP) and back-propagation(BP). The forward phase randomly select a batch of training inputs and calculates their inference result with the current model. The back-propagation phase calculates the gradient of error to the weights in each layer according to the chain rule and update the weights by gradient descent. We further separate this phase into 2 phases: error back-propagation (EB) phase calculates the gradient of error, $\partial E/\partial y_i$ to the output of each layer; weight gradient (WG) phase calculates the gradient of weights $\partial E/\partial W_i$ in each layer and update the weights. 
+
+One trains a CNN by iteratively conduct FP and BP until the weights converge. In each iteration, a batch of inputs are sent to the network and the corresponding gradients are added together to update the weights.
 
 \begin{figure}[t]
   \centering
