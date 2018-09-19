@@ -50,19 +50,7 @@ We perform the experiment using VGG-11\cite{Simonyan2014Very} on CIFAR-10\cite{k
 
 Furthermore, we also evaluate where is a good point to stop floating point training and starts fixed point training with pruned weights. Usually, we prune model when it is perfectly trained and achieves the best accuracy. But if we want to save the training time, we do not need to prune model until it perfectly trained. Table~\ref{table:prune} shows experimental results for pruning at different training stages. 
 
-\begin{table}[tb]
-\centering
-\caption{Comparison of training result with different number of initial epochs before training}
-\label{table:prune}
-\begin{tabular}{ccccc}
-\hline
-\begin{tabular}[c]{@{}c@{}}Initial\\ accuracy\end{tabular} & \begin{tabular}[c]{@{}c@{}}Initial\\ epochs\end{tabular} & \begin{tabular}[c]{@{}c@{}}Fine-tune\\ Accuracy\end{tabular} & \begin{tabular}[c]{@{}c@{}}Fine-tune\\ epoches\end{tabular} & \begin{tabular}[c]{@{}c@{}}Total\\ epoches\end{tabular} \\ \hline
-90.98                                                      & 220                                                       & 90.81                                                        & 100                                                         & 320                                                     \\
-90.05                                                      & 130                                                       & 91.11                                                        & 200                                                          & 330                                                     \\
-89.58                                                      & 100                                                        & 91.01                                                        & 195                                                         & 295                                                     \\
-88.06                                                      & 65                                                        & 90.54                                                        & 130                                                         & 195                                                     \\
-85.50                                                      & 45                                                        & 90.05                                                        & 115                                                         & 160                                                     \\\hline
-\end{tabular}
-\end{table}
+\input{tables/cifar_train.tex}
+
 
 The result in Table~\ref{table:prune} shows that, if we start pruning at half of training, it may cost less epochs without harming accuracy, even with small accuracy improvement. The best accuracy occurred having 130 epochs of dense training and 200 epochs of sparse training. The stopping criteria is when the learning curve starts to flatten. In this training task, 200 out of 330 epochs can be accelerated with hardware.
