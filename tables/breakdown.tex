@@ -1,0 +1,27 @@
+
+\begin{table*}[tb]
+    \centering
+    %\footnotesize
+    \caption{The performance of each layer. \textit{Comp.} indicates the complexity of each layer. \textit{Perf.} indicates the performance of running each layer on our hardware. \textit{Bound type} indicates the performance of each layer is bounded with bandwidth (B) or computation (C).}
+    \begin{tabular}{c|c|cccc|cccc|cccc}  \hline
+        &       & \multicolumn{4}{c|}{Forward Pass (FP)}  & \multicolumn{4}{c|}{Error Backpropagation (EB)} & \multicolumn{4}{c}{Weight Gradient (WG)} \\
+  \cline{2-14}layer & Comp. & Time  & Perf. & bound & Utilize & Time  & Perf. & bound & Utilize & Time  & Perf. & bound & Utilize \\
+        & (GOP) & (us)  & (GOP/s) & type  & rate  & (us)  & (GOP/s) & type  & rate  & (us)  & (GOP/s) & type  & rate \\
+  \hline
+  conv1 & 0.11  & 733   & 154.4  & B     & 27\%  & -     & -     & -     & -     & 4158  & 27.2  & B     & 5\% \\
+  conv2 & 1.21  & 1487  & 812.2  & C     & 95\%  & 1487  & 812.5  & C     & 95\%  & 2804  & 430.8  & B     & 50\% \\
+  conv3\_1 & 1.21  & 1696  & 712.4  & C     & 97\%  & 1694  & 713.0  & C     & 97\%  & 2477  & 487.7  & B     & 67\% \\
+  conv3\_2 & 2.42  & 2877  & 839.7  & C     & 98\%  & 2876  & 840.1  & C     & 98\%  & 4398  & 549.3  & B     & 64\% \\
+  conv4\_1 & 1.21  & 1217  & 992.3  & C     & 97\%  & 1217  & 992.9  & C     & 97\%  & 2686  & 449.8  & B     & 44\% \\
+  conv4\_2 & 2.42  & 1457  & 1658.4  & C     & 97\%  & 1456  & 1659.2  & C     & 97\%  & 3933  & 614.2  & B     & 36\% \\
+  conv5\_1 & 0.60  & 366   & 1651.7  & B     & 32\%  & 358   & 1687.7  & B     & 33\%  & 915   & 659.8  & B     & 13\% \\
+  conv5\_2 & 0.60  & 365   & 1652.7  & B     & 32\%  & 358   & 1688.7  & B     & 33\%  & 915   & 660.0  & B     & 13\% \\
+  dense6 & 0.02  & 329   & 51.0  & B     & 1\%   & 328   & 51.1  & B     & 1\%   & 717   & 23.4  & B     & 0.5\% \\
+  dense7 & 0.02  & 329   & 51.0  & B     & 1\%   & 328   & 51.1  & B     & 1\%   & 717   & 23.4  & B     & 0.5\% \\
+  dense8 & 0.003  & 75    & 4.4   & B     & 0.1\% & 74    & 4.4   & B     & 0.1\% & 272   & 1.2   & B     & 0.02\% \\
+  \hline
+  total & 9.81  & 10931  & 897.5  & -     & -     & 10988  & 892.8  & -     & -     & 23993  & 408.9  & -     & - \\
+  \hline
+  \end{tabular}%
+    \label{tab:layerperformance}%
+  \end{table*}%

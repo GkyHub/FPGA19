@@ -1,6 +1,6 @@
 \section{Hardware Design}\label{sec:hw}
 
-\begin{figure*}[t]
+\begin{figure*}[htbp]
   \centering
   \includegraphics[width=2\columnwidth]{figures/hardware.pdf}
   \caption{The CNN training accelerator architecture. (a) The overall system architecture. (b) The structure of a single PE. }
@@ -10,40 +10,26 @@
 In this section, we introduce the hardware design for training CNN with sparse parameters. Especially, we will show architecture support for sparse operations and how this design differ from inference accelerators.
 
 \subsection{Overall Architecture}
-Figure~\ref{fig:arch}(a) shows the overall architecture of the hardware design. 
-% \SH{seems to be the same as the FPGA'16 figure; there's not much information in this figure.}
-% below are redundant for ISCA:
-% The proposed architecture serves as an accelerator for a CPU host system.
-% The accelerator is connected with the host CPU through the PCIe interface. 
-When the accelerator works, the host CPU sends a mini-batch of training data to the accelerator to process an iteration of training. The accelerator first processes inference on the mini-batch and sends back the result vector to CPU to calculate the loss. After that, the gradient vector of the last layer is given back to the accelerator to do back propagation. This process
- is iteratively executed until training converges.
+Figure~\ref{fig:arch}(a) shows the overall architecture of the hardware design. When the accelerator works, the host CPU sends a mini-batch of training data to the accelerator to process an iteration of training. The accelerator first processes inference on the mini-batch and sends back the result vector to CPU to calculate the loss. After that, the gradient vector of the last layer is given back to the accelerator to do back propagation. This process is iteratively executed until training converges.
 
 External memory are implemented to meet the large storage requirement of training. Compared with inference, the feed-forward results of each layer of the mini-batch should be kept until back propagation is done. Though we use fixed-point data for training, the training on a mini-batch still requires GB level of memory, which is impractical to be stored on-chip. A set of on-chip buffers are implemented to explore the spatial locality of convolution operation and allows fast irregular data access for sparse operations. Details of each PE will be introduced in section~\ref{sec:hw_pe}.
 
-The CNN layers are executed on the hardware layer by layer. For pooling and ReLU layers, the FF, NG and WG stages are all implemented as a pipeline stage after or before PE. Because pooling and ReLU layers has little workload, the functions are implemented as common modules for all the PEs and can be bypassed if necessary. For each layer, the data is first loaded from DDR and is sent to the Upsample/Mask unit. In inference phase, the data is directly issued to corresponding PEs. In back propagation phase, upsampling and mask function is applied on the activation data. Then in each PE, the calculation of the nested loops are processed. Then the results are sent to Pooling/ReLU/Merge unit where the pooling and ReLU function is applied as traditional CNN inference accelerator design. The merge function adds gradient result from different PEs during back propagation phase.
+The CNN layers are executed on the hardware layer by layer. For pooling and ReLU layers, the FP, EB and WG phases are all implemented as a pipeline stage after or before PE. Because pooling and ReLU layers has little workload, the functions are implemented as common modules for all the PEs and can be bypassed if necessary. For each layer, the data is first loaded from DDR and is sent to the Upsample/Mask unit. In inference phase, the data is directly issued to corresponding PEs. In back propagation phase, upsampling and mask function is applied on the activation data. Then in each PE, the calculation of the nested loops are processed. Then the results are sent to Pooling/ReLU/Merge unit where the pooling and ReLU function is applied as traditional CNN inference accelerator design. The merge function adds gradient result from different PEs during back propagation phase.
 
 \subsection{PE for Sparse Computation}\label{sec:hw_pe}
 
-\begin{figure}[htb]
-  \centering
-  \includegraphics[width=1.0\columnwidth]{figures/agu.pdf}
-  \caption{AGU architecture.}
-  \label{fig:agu}
-\end{figure}
-
 To fully take advantage of the sparse weights in training, the hardware should support the following two types of sparse operations:
 \begin{itemize}
-\item $D\times S=D$: For FF and NG steps, the neurons or neuron gradients are multiplied with the sparse weights to get the neuron of next layer or the gradient of the previous layer. So one of the two operators for multiplication is sparse.
-\item $D\times D=S$: For wG steps, the neurons are multiplied with the back propagated neuron gradients to get the weight gradients. Both the operators of multiplication are dense but the result is sparse.
+\item {\bf Operator-sparse}: For FP and EB steps, the activations or errors are multiplied with the sparse weights to get the result feature map or errors. So one of the two operators for multiplication is sparse.
+\item {\bf Result-sparse}: For WG steps, the activations are multiplied with the back propagated errors to get the weight gradients. Both the operators of multiplication are dense but the result is sparse.
 \end{itemize}
 
-\begin{figure*}[t] 
+\begin{figure*}[htbp] 
   \centering
   \includegraphics[width=1.8\columnwidth]{figures/sparse_mv.pdf}
   \caption{The hardware behavior for sparse network process. (a) Sparse matrix vector multiplication for inference and calculation of gradient of activations. (b) Vector vector multiplication to calculate the gradient of sparse parameters. }
   \label{fig:spmv}
 \end{figure*}
-
 
 We choose to process the sparse computation in a block manner. In this manner, the hardware can support both of the sparse operation types efficiently. An example of a $4\times 4$ block of fully connected layer executed in a PE is shown in Figure~\ref{fig:spmv}. Each weight matrix element is stored with its relative 2-D position in the block. Each time a pair of index $(x, y)$ is fetched from the index buffer. For inference, as shown in Figure~\ref{fig:spmv}(a), $x$ is used to access the activations in data buffer and $y$ is used to access the result. To calculate the gradient of the sparse parameters, data buffer and parameter buffer store the activation of two adjacent layers. $x$ and $y$ are used to access the buffers respectively. Different PEs work independently on different blocks for higher parallelism.
 

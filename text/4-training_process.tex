@@ -48,5 +48,4 @@ Furthermore, we also evaluate where is a good point to stop floating point train
 
 \input{tables/cifar_train.tex}
 
-
 The result in Table~\ref{table:prune} shows that, if we start pruning at half of training, it may cost less epochs without harming accuracy, even with small accuracy improvement. The best accuracy occurred having 130 epochs of dense training and 200 epochs of sparse training. The stopping criteria is when the learning curve starts to flatten. In this training task, 200 out of 330 epochs can be accelerated with hardware.

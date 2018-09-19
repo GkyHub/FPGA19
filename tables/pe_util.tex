@@ -1,0 +1,29 @@
+\begin{table}[tb]
+    \centering
+    \caption{Comparison of PE utilization with different group sizes on a network}
+      \begin{tabular}{|c|c|r|r|r|r|r|}
+      \hline
+      \multirow{2}[4]{*}{Layer} & Feature & Workload & \multicolumn{3}{c|}{Utilization} \\
+  \cline{4-6}          & size & (MOP) & Single & 2x2 & Ideal\\
+      \hline
+      conv1 & $32\times 32$ & 3.54 & 80    & 88.5  & 100\\
+      \hline
+      conv2 & $16\times 16$ & 151 & 88.6  & 95.8  & 100\\
+      \hline
+      conv3\_1 & $8\times 8$   & 37.7 & 95.1  & 98.2  & 100\\
+      \hline
+      conv3\_2 & $8\times 8$   & 75.5 & 96.4  & 98.8  & 100\\
+      \hline
+      conv4\_1 & $4\times 4$   & 37.7 & 96.3  & 98.7  & 100\\
+      \hline
+      conv4\_2 & $4\times 4$   & 75.5 & 95.6  & 98.4  & 100\\
+      \hline
+      conv5\_1 & $2\times 2$   & 18.87 & 93.5  & 97.8  & 100\\
+      \hline
+      conv5\_2 & $2\times 2$   & 18.87 & 93.5  & 97.8  & 100\\
+      \hline
+      \multicolumn{3}{|c|}{Normalized Speed} & 1     & 1.050 & 1.078 \\
+      \hline
+      \end{tabular}
+    \label{tab:hw_util}
+  \end{table}
