@@ -1,33 +1,29 @@
 \section{Hardware Friendly Training}\label{sec:training}
-
-We first introduce two hardware-friendly training methods: fixed-point training and structured sparsity, followed by validating these methods on the real dataset.
+In this section, we introduce our hardware-friendly training method using fixed point data and structured pruning. 
 
 \subsection{Fixed-point Data Based Training}
 Traditional CNN training relies on full-precision data, i.e. 32-bit floating point data, to guarantee a good training accuracy. However, using fixed-point data in training process can help increase the energy efficiency of training. For CNN inference, varies accelerators have been proposed with fixed point operations to increase energy efficiency. For training, using fixed point data usually suffers great model accuracy loss. Recent work~\cite{zhou2016dorefa} use narrow bit-width only for data storage in training process but have to convert the data to floating point to process addition and multiplication. In this paper, we propose a training process using both fixed point format for data storage and computation. 
 
-In the proposed training process, every fixed-point number is represented with low bit-width (e.g. 8 bit in our implementation) together with a scaling factor. We keep a common scale for each fixed-point blob, where a blob can be the activation of a layer, the weights of a layer, or the gradients of the weights/activations of a layer. Using this data format naively will induce two problems.
+In the proposed training process, every fixed-point number is represented with low bit-width (e.g. 8 bit in our implementation) together with a scaling factor. We keep a common scale for each fixed-point blob, where a blob can be the activation, weights, gradient or error of a layer. Directly using this data format will induce two problems.
 
-The first problem is how to convert the original floating point data to the fixed point version. This means to decide the scaling factor for each data blob. One choice is to use the dynamic range of each blob as the scaling factor can keep the data precision to the best degree, but this brings extra statistic and normalization operations for each data blob in each iteration. In this work, we focus on fine-tuning a pruned network. 
-% \SH{don't let reviewers have the impression that you're bypassing the hardcore problem by fine-tuning.}
-So we execute floating-point training iterations to analyze the dynamic scale of each blob and keep the scale through the rest of training process. Furthermore, we choose the nearest $2^n$ as the scaling factor which means data normalization can be implemented with shift operations on fixed-point data.
+The first problem is how to convert the original floating point data to the fixed point version. This means to decide the scaling factor for each data blob. One choice is to use the dynamic range of each blob as the scaling factor can keep the data precision to the best degree, but this brings extra statistic and normalization operations for each data blob in each iteration. In this work, we execute floating-point training iterations to analyze the dynamic scale of each blob and keep the scale through the rest of training process. We choose the nearest $2^n$ as the scaling factor which means data normalization can be implemented with shift operations on fixed-point data.
 
-The second problem is the trade-off between bit-width and training accuracy. Low bit-width simplifies operations and reduce the storage consumption, but also reduce the model accuracy. For CNN training, the update step in each iteration is usually small because of small learning rate and gradient vanishing. Thus the update step is easy to underflow if using fixed point data with narrow bit-width.  In this work, we use narrow bit-width for activations and gradients. Because the scaling factor of gradient blob can be much smaller than that of weights, we use a larger bit-width to avoid gradient underflow when the gradients and weights are to be aligned and added together. To reduce the hardware cost for each operation, we only use the MSBs of weights to execute feed forward and back propagation.
-
-An example of the proposed fixed-point based training process is shown in Figure~\ref{fig:train_fixed}. The right part of the figure shows the feed forward phase of the network from top to bottom while the left part shows the back propagation phase from bottom to top. The learning rate is merged with the scaling factor and converted to shift operation before computing $\Delta W$ and $\Delta B$. Currently, weight decay and momentum are not supported in our hardware design. So we also omit these two functions in our software experiments. These two functions will not greatly affect hardware design and are to be supported in the future.
+The second problem is the trade-off between bit-width and training accuracy. Low bit-width simplifies operations and reduce the storage consumption, but also reduce the model accuracy. Consider the small learning rate and gradient vanishing, the updated value in each iteration is small, the scaling factor of weights can be much larger than that of gradients. We use a larger bit-width to avoid gradient underflow in WG phase and only use the MSBs of weights in FP and EB phases.
 
 \begin{figure}[tb]
   \centering 
-  \includegraphics[width=1.0\columnwidth]{figures/fixed_train.pdf}
+  \includegraphics[width=0.8\columnwidth]{figures/fixed_train.pdf}
   \caption{Training process comparison. (a) Training with floating point data. (b) Training with fixed-point data. }
-  \label{fig:train_fixed}
+  \label{fig:fixed_train}
 \end{figure}
 
 \subsection{Structured Pruning}
 
-We denote shape of weights as $(N, C, H, W)$. $N$ represents output channel, $C$ represents input channel, $H$ represents height, and $W$ represents weight. Compared to element-wise pruning, group-wise pruning is more efficient for hardware to realize. We choose kernel-dim pruning, which means the atomic elements during pruning is $H \times W$. L2-norm of the atomic elements is calculated, and atomic elements with small l2-norm are pruned. Mask matrix is used to label where is pruned and has the same shape as weights. If the weight is pruned, its mask becomes 0. Then we get sparse weights and mask matrix. 
+We denote shape of weights as $(N, C, H, W)$. $N$ represents output channel, $C$ represents input channel, $H$ represents height, and $W$ represents weight. Compared to element-wise pruning, group-wise pruning is more efficient for hardware to realize. We choose kernel-dim pruning, which means the atomic elements during pruning is $H \times W$. L2-norm of each $H \times W$ atomic elements is used for pruning. For training with software mask matrix is used to label where is pruned and has the same shape as weights. If the weight is pruned, its mask becomes 0. Then we get sparse weights and mask matrix. 
 
 \begin{figure}[tb]
-    \centering\includegraphics[width=3.5in]{figures/prune-light.pdf}
+    \centering
+    \includegraphics[width=0.8\columnwidth]{figures/prune.pdf}
     \caption{Illustration of the group-wise pruning}\label{fig:prune}
 \end{figure}
 
