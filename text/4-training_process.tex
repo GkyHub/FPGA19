@@ -12,8 +12,8 @@ The second problem is the trade-off between bit-width and training accuracy. Low
 
 \begin{figure}[tb]
   \centering 
-  \includegraphics[width=0.8\columnwidth]{figures/fixed_train.pdf}
-  \caption{Training process comparison. (a) Training with floating point data. (b) Training with fixed-point data. }
+  \includegraphics[width=0.9\columnwidth]{figures/fixed_train.pdf}
+  \caption{Proposed hardware-friendly training process with fixed-point data. The weights are stored with long bit-width (32-bit in the figure) to make valid accumulation. The computations are processed with short bit-width (8-bit in the figure).}
   \label{fig:fixed_train}
 \end{figure}
 
