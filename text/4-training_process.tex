@@ -19,11 +19,13 @@ The second problem is the trade-off between bit-width and training accuracy. Low
 
 \subsection{Structured Pruning}
 
-We denote shape of weights as $(N, C, H, W)$. $N$ represents output channel, $C$ represents input channel, $H$ represents height, and $W$ represents weight. Compared to element-wise pruning, group-wise pruning is more efficient for hardware to realize. We choose kernel-dim pruning, which means the atomic elements during pruning is $H \times W$. L2-norm of each $H \times W$ atomic elements is used for pruning. For training with software mask matrix is used to label where is pruned and has the same shape as weights. If the weight is pruned, its mask becomes 0. Then we get sparse weights and mask matrix. 
+We denote shape of weights as $(N, C, H, W)$. $N$ represents output channel, $C$ represents input channel, $H$ represents height, and $W$ represents weight. Compared to element-wise pruning, group-wise pruning is more efficient for hardware to realize. We choose kernel-dim pruning, which means the atomic elements during pruning is $H \times W$. 
+
+The priority for pruning is measured by the L2-norm of each $H \times W$ atomic element. Smaller L2-norm means higher pruning priority. The pruning process is automatically done by pruning atomic elements with the highest priority as long as the model accuracy drop on validation set is within a given threshold. To reduce the time for validation, pruning is done layer by layer and with a step of 10\% weights of each layer.
 
 \begin{figure}[tb]
     \centering
-    \includegraphics[width=0.8\columnwidth]{figures/prune.pdf}
+    \includegraphics[width=0.9\columnwidth]{figures/prune.pdf}
     \caption{Illustration of the group-wise pruning}\label{fig:prune}
 \end{figure}
 
