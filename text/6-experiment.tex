@@ -1,11 +1,30 @@
 \section{Experiment}\label{sec:experiment}
-In section~\ref{sec:training}, we have shown the model accuracy and epoch consumption of the proposed hardware friendly training process. In this section, we show the hardware experimental results. A prototype design is implemented on a Xilinx XCKU115 chip with 2 on-board DDR4 SDRAM. In this system, feature map, neuron and their gradients are all of 8-bit and stored in DDR0. Network weights, each of which includes 8-bit MSB for computation and 24-bit LSB buffer, are stored in DDR1. Corresponding index for sparse representation are stored in DDR0 using \{y[3:0], x[3:0]\} format. This means the the maximum weights block size can be $16\times 16$. The system operates at 200MHz. Each $2\times 2$ PEs are grouped together for CONV layers.
+In this section, we first evaluate the proposed training process on real dataset. Then we show the hardware experimental results. 
+
+\subsection{Evaluation of Training}
+We first evaluate the proposed training method with a software version implemented with Tensorflow. We use CIFAR-10 dataset for evaluation. In the following experiments, we quantize the activations, weights and errors to 8-bit and gradients to 24-bit. We test the effect of applying quantization and pruning at different stages of normal training. The pruning result is shown in Figure~\ref{fig:prune_exp}, where the model is VGG-11~\cite{simonyan2014very}, with 8 convolution layers and 3 fully connected layers. The ratio of pruned weights does not vary greatly through the process of normal training. In general, most of the layers can be pruned to 40\% or less of the original size. 
+
+\begin{figure}[tb]
+  \centering
+  \includegraphics[width=1.0\columnwidth]{figures/pruning_exp.pdf}
+  \caption{Ratio of pruned weights at different training stages.}
+  \label{fig:prune_exp}
+\end{figure}
+
+The training accuracy is shown in Figure~\ref{fig:fixed_train_exp}. It is shown from the figure that through the process of 300-epoch training, we can start quantization and pruning as early as 60 epochs and get similar accuracy as normal training. 
+
+\begin{figure}[tb]
+  \centering
+  \includegraphics[width=1.0\columnwidth]{figures/fixed_train_exp.pdf}
+  \caption{Accuracy curve of different training evaluation when quantization and pruning are applied at different stages. The number for each curve denotes the number of normal training epochs and baseline denotes a training without quantization and pruning. }
+  \label{fig:fixed_train_exp}
+\end{figure}
 
 \input{tables/resource_util.tex}
 
 \subsection{Effect of Workload Imbalance}\label{sec:exp:imb}
 
-Before introducing the hardware performance, we first analyze the theoretical performance loss brought by workload imbalance in Table~\ref{table:sparsity}. As introduced in section~\ref{sec:hw_unroll}, unroll parameters are limited by loop dimension variety and sparsity. As we cannot group the PEs for fully connected layers, we only compare on the convolutional layers. The normalized speed on the convolutional layers of each configuration is shown in Table~\ref{tab:hw_util}.
+Before evaluating the hardware performance, we first analyze the theoretical performance loss brought by workload imbalance in Table~\ref{table:sparsity}. As introduced in section~\ref{sec:hw_unroll}, unroll parameters are limited by loop dimension variety and sparsity. As we cannot group the PEs for fully connected layers, we only compare on the convolutional layers. The normalized speed on the convolutional layers of each configuration is shown in Table~\ref{tab:hw_util}.
 
 \input{tables/pe_util.tex}
 
@@ -16,11 +35,11 @@ Before introducing the hardware performance, we first analyze the theoretical pe
   \label{fig:util_real}
 \end{figure}
 
-Here, we see that using 32 PEs for this network will suffer from $7\%$ performance loss compared with the ideal case where no workload imbalance occurs. Group each 4 PEs together brings about $5\%$ performance increase. %Figure~\ref{fig:util_real} shows the utilization ratio of each layer over the number of PE(PE groups). The performance loss in the second layer contributes the most. Further increase the number of PEs will 
+Here, we see that using 32 PEs for this network will suffer from $7\%$ performance loss compared with the ideal case where no workload imbalance occurs. Group each 4 PEs together brings about $5\%$ performance increase. 
 
 
 \subsection{Hardware Performance}
-We simulate the performance of each layer in each training step with the DDR model and controller from Xilinx IP. Detailed running time and performance are shown in Table~\ref{tab:layerperformance}.
+A prototype design is implemented on a Xilinx XCKU115 chip with 2 on-board DDR4 SDRAM. In this system, feature map, neuron and their gradients are all of 8-bit and stored in DDR0. Network weights, each of which includes 8-bit MSB for computation and 24-bit LSB buffer, are stored in DDR1. Corresponding index for sparse representation are stored in DDR0 using \{y[3:0], x[3:0]\} format. This means the the maximum weights block size can be $16\times 16$. The system operates at 200MHz. Each $2\times 2$ PEs are grouped together for CONV layers. We simulate the performance of each layer in each training step with the DDR model and controller from Xilinx IP. Detailed running time and performance are shown in Table~\ref{tab:layerperformance}.
 
 \input{tables/breakdown.tex}
 

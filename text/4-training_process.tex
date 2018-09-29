@@ -1,7 +1,14 @@
 \section{Hardware Friendly Training}\label{sec:training}
-In this section, we introduce our hardware-friendly training method using fixed point data and structured pruning. 
+In this section, we introduce our hardware-friendly training method using fixed point data and advanced pruning. The whole training process includes the following steps:
+\begin{itemize}
+  \item Train the model with full-precision activations, weights, gradients and errors.
+  \item Apply quantization to activations, weights, gradients and errors according to the last epoch of training.
+  \item Prune the model. 
+  \item Continue training the pruned model with fixed-point activations, weights, gradients and errors.
+\end{itemize}
+We will focus on data quantization and pruning in this section.
 
-\subsection{Fixed-point Data Based Training}
+\subsection{Data Quantization in Training}
 Traditional CNN training relies on full-precision data, i.e. 32-bit floating point data, to guarantee a good training accuracy. However, using fixed-point data in training process can help increase the energy efficiency of training. For CNN inference, varies accelerators have been proposed with fixed point operations to increase energy efficiency. For training, using fixed point data usually suffers great model accuracy loss. Recent work~\cite{zhou2016dorefa} use narrow bit-width only for data storage in training process but have to convert the data to floating point to process addition and multiplication. In this paper, we propose a training process using both fixed point format for data storage and computation. 
 
 In the proposed training process, every fixed-point number is represented with low bit-width (e.g. 8 bit in our implementation) together with a scaling factor. We keep a common scale for each fixed-point blob, where a blob can be the activation, weights, gradient or error of a layer. Directly using this data format will induce two problems.
@@ -19,35 +26,12 @@ The second problem is the trade-off between bit-width and training accuracy. Low
 
 \subsection{Advanced Pruning}
 
-We also apply pruning to the model to accelerate training. Traditional pruning is usually applied when the model is well trained. To increase the potential of acceleration, we choose to prune the model before the training process converges. We also use a structured pruning method for convolution layers to simplify the hardware design.  We denote shape of weights as $(N, C, H, W)$. $N$ represents output channel, $C$ represents input channel, $H$ represents height, and $W$ represents width. The pruning method masks each $H\times W$ kernel as a whole if the L2-norm of the kernel is small. 
+We also apply pruning to the model to accelerate training. By forcing part of the weights to zero, we reduce not only the computation in FP and EB phases, but also the computation in WG phases because the gradients to the zero weights are not needed. Traditional pruning is usually applied when the model is well trained. To increase the potential of acceleration, we choose to prune the model before the training process converges. We also use a structured pruning method for convolution layers to simplify the hardware design. We denote shape of weights as $(N, C, H, W)$. $N$ represents output channel, $C$ represents input channel, $H$ represents height, and $W$ represents width. The pruning method masks each $H\times W$ kernel as a whole if the L2-norm of the kernel is small. 
 
 In this work, the pruning process is automatically done by pruning the kernels with the smallest L2-norms as long as the accuracy drop of the model is within a given range. To reduce the time for validation, pruning is done layer by layer and with a step of 10\% weights of each layer.
 
 \begin{figure}[tb]
     \centering
     \includegraphics[width=0.9\columnwidth]{figures/prune.pdf}
-    \caption{Illustration of the group-wise pruning}\label{fig:prune}
+    \caption{Illustration of the kernel-wise pruning}\label{fig:prune}
 \end{figure}
-
-\input{tables/cifar_model.tex}
-
-\subsection{Software Validation}
-
-The whole training process used in this work is as follows:
-\begin{itemize}
-\item Train the model with full-precision activations, weights, gradients and errors.
-\item Apply quantization to activations, weights, gradients and errors according to the last epoch of training.
-\item Prune the model. 
-\item Continue training the pruned model.
-\end{itemize}
-
-The first two steps are implemented with software which use CPU and GPU as the computation platform. The third step can be executed with the proposed hardware architecture. To test the performance of the fixed-point based training method, we implemented a software version of the fixed-point data based CONV, ReLU, and pooling layers on TensorFlow.
-
-In our implementation, the bit width of the weight buffer is set to be 24bit. The fixed scale of every gradient accumulation buffer is decided using the weight scale, the gradient scale and the learning rate after the first step. In this fine-tune stage, the fixed scales for every weight/activation/gradient blobs are fixed, and no momentum or weight decay is used. This ensures that every detail will be the same as the hardware implementation.
-
-We perform the experiment using VGG-11\cite{Simonyan2014Very} on CIFAR-10\cite{krizhevsky2009learning} dataset. While training in the first step, the learning rate is set to 0.05 and decayed by 0.5 every 30 epochs; weight decay is set to $5 \times 10^{-4}$ and momentum is set to 0.9. We pruned model to the same sparsity in the whole experiments shown in Table~\ref{table:sparsity}. In the third training step with fixed point data, we compare the result of training with and without momentum. The accuracy is nearly the same(90.54 vs. 90.53). 
-
-
-\input{tables/cifar_train.tex}
-
-The result in Table~\ref{table:prune} shows that, if we start pruning at half of training, it may cost less epochs without harming accuracy, even with small accuracy improvement. The best accuracy occurred having 130 epochs of dense training and 200 epochs of sparse training. The stopping criteria is when the learning curve starts to flatten. In this training task, 200 out of 330 epochs can be accelerated with hardware.
