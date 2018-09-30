@@ -24,7 +24,7 @@ The training accuracy is shown in Figure~\ref{fig:fixed_train_exp}. It is shown 
 
 \subsection{Effect of Workload Imbalance}\label{sec:exp:imb}
 
-Before evaluating the hardware performance, we first analyze the theoretical performance loss brought by workload imbalance in Table~\ref{table:sparsity}. As introduced in section~\ref{sec:hw_unroll}, unroll parameters are limited by loop dimension variety and sparsity. As we cannot group the PEs for fully connected layers, we only compare on the convolutional layers. The normalized speed on the convolutional layers of each configuration is shown in Table~\ref{tab:hw_util}.
+Before evaluating the hardware performance, we first analyze the theoretical performance loss brought by workload imbalance. As introduced in section~\ref{sec:hw_unroll}, unroll parameters are limited by loop dimension variety and sparsity. As we cannot group the PEs for fully connected layers, we only compare on the convolutional layers. The normalized speed on the convolutional layers of each configuration is shown in Table~\ref{tab:hw_util}.
 
 \input{tables/pe_util.tex}
 
