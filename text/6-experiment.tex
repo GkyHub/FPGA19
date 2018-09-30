@@ -2,12 +2,12 @@
 In this section, we first evaluate the proposed training process on real dataset. Then we show the hardware experimental results. 
 
 \subsection{Evaluation of Training}
-We first evaluate the proposed training method with a software version implemented with Tensorflow. We use the VGG-11 model~\cite{simonyan2014very} on CIFAR-10 dataset for evaluation. The model consists of 8 convolution layers and 3 fully connected layers. We first test pruning the model after different normal training epochs, for which the result is shown in Figure~\ref{fig:prune_exp}. The ratio of pruned weights does not vary greatly through the process of normal training. In general, most of the layers can be pruned to 40\% or less of the original size. This brings great potential of acceleration if hardware supports sparsity well.
+We first evaluate the proposed training method with a software version implemented with Tensorflow. We use the VGG-11 model~\cite{simonyan2014very} on CIFAR-10 dataset for evaluation. The model consists of 8 convolution layers and 3 fully connected layers. We first test pruning the model after different normal training epochs. We train the model with floating point data and saves checkpoints after every 30 epochs. The saved checkpoints are pruned using the method in section~\ref{sec:training:prune}. The results are shown in Figure~\ref{fig:prune_exp}. The ratio of pruned weights does not vary greatly through the process of normal training. In general, most of the layers can be pruned to 40\% or less of the original size. This brings great potential of acceleration if hardware supports sparsity well.
 
 \begin{figure}[tb]
   \centering
   \includegraphics[width=1.0\columnwidth]{figures/pruning_exp.pdf}
-  \caption{Ratio of pruned weights at different training stages.}
+  \caption{Ratio of pruned weights after different numbers of normal training epochs. }
   \label{fig:prune_exp}
 \end{figure}
 
@@ -15,7 +15,7 @@ Then we test training the pruned models with different weight buffer sizes. We f
 
 \begin{figure*}[tb]
   \centering
-  \includegraphics[width=1.0\columnwidth]{figures/fixed_train_exp.pdf}
+  \includegraphics[width=2.0\columnwidth]{figures/fixed_train_exp.pdf}
   \caption{Accuracy curve of different training evaluation when quantization and pruning are applied at different stages. The number for each curve denotes the number of normal training epochs and baseline denotes a training without quantization and pruning. }
   \label{fig:fixed_train_exp}
 \end{figure*}
@@ -24,7 +24,7 @@ Then we test training the pruned models with different weight buffer sizes. We f
 
 \subsection{Effect of Workload Imbalance}\label{sec:exp:imb}
 
-Before evaluating the hardware performance, we first analyze the theoretical performance loss brought by workload imbalance in Table~\ref{table:sparsity}. As introduced in section~\ref{sec:hw_unroll}, unroll parameters are limited by loop dimension variety and sparsity. As we cannot group the PEs for fully connected layers, we only compare on the convolutional layers. The normalized speed on the convolutional layers of each configuration is shown in Table~\ref{tab:hw_util}.
+Before evaluating the hardware performance, we first analyze the theoretical performance loss brought by workload imbalance. As introduced in section~\ref{sec:hw_unroll}, unroll parameters are limited by loop dimension variety and sparsity. As we cannot group the PEs for fully connected layers, we only compare on the convolutional layers. The normalized speed on the convolutional layers of each configuration is shown in Table~\ref{tab:hw_util}.
 
 \input{tables/pe_util.tex}
 

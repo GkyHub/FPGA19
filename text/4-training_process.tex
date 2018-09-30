@@ -24,7 +24,7 @@ The second problem is the trade-off between bit-width and training accuracy. Low
   \label{fig:fixed_train}
 \end{figure}
 
-\subsection{Advanced Pruning}
+\subsection{Advanced Pruning}\label{sec:training:prune}
 
 We also apply pruning to the model to accelerate training. By forcing part of the weights to zero, we reduce not only the computation in FP and EB phases, but also the computation in WG phases because the gradients to the zero weights are not needed. Traditional pruning is usually applied when the model is well trained. To increase the potential of acceleration, we choose to prune the model before the training process converges. We also use a structured pruning method for convolution layers to simplify the hardware design. We denote shape of weights as $(N, C, H, W)$. $N$ represents output channel, $C$ represents input channel, $H$ represents height, and $W$ represents width. The pruning method masks each $H\times W$ kernel as a whole if the L2-norm of the kernel is small. 
 
