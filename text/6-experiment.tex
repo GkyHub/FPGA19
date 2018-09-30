@@ -2,7 +2,7 @@
 In this section, we first evaluate the proposed training process on real dataset. Then we show the hardware experimental results. 
 
 \subsection{Evaluation of Training}
-We first evaluate the proposed training method with a software version implemented with Tensorflow. We use CIFAR-10 dataset for evaluation. In the following experiments, we quantize the activations, weights and errors to 8-bit and gradients to 24-bit. We test the effect of applying quantization and pruning at different stages of normal training. The pruning result is shown in Figure~\ref{fig:prune_exp}, where the model is VGG-11~\cite{simonyan2014very}, with 8 convolution layers and 3 fully connected layers. The ratio of pruned weights does not vary greatly through the process of normal training. In general, most of the layers can be pruned to 40\% or less of the original size. 
+We first evaluate the proposed training method with a software version implemented with Tensorflow. We use the VGG-11 model~\cite{simonyan2014very} on CIFAR-10 dataset for evaluation. The model consists of 8 convolution layers and 3 fully connected layers. We first test pruning the model after different normal training epochs, for which the result is shown in Figure~\ref{fig:prune_exp}. The ratio of pruned weights does not vary greatly through the process of normal training. In general, most of the layers can be pruned to 40\% or less of the original size. This brings great potential of acceleration if hardware supports sparsity well.
 
 \begin{figure}[tb]
   \centering
@@ -11,14 +11,14 @@ We first evaluate the proposed training method with a software version implement
   \label{fig:prune_exp}
 \end{figure}
 
-The training accuracy is shown in Figure~\ref{fig:fixed_train_exp}. It is shown from the figure that through the process of 300-epoch training, we can start quantization and pruning as early as 60 epochs and get similar accuracy as normal training. 
+Then we test training the pruned models with different weight buffer sizes. We force the total training epochs to be 300. The model accuracy curves are shown in Figure~\ref{fig:fixed_train_exp}. When using 24-bit weight buffer, we see that training still works when gradients are quantized. But when to apply pruning and quantization matters. Starting as early as 30 epochs drops the final model accuracy from 90.62\% to 88.94\%. While starting as late as 240 epochs can even lead to worse result: the accuracy fluctuates around 87\%. Choose somewhere in the middle seems to bring good results but more experiments are needed to verify this conclusion. In this experiment, start quantization and pruning after only 60 epochs still brings 90.65\% accuracy at the end of training. When using 16-bit weight buffer, all the training stops after 120 epochs of training because the learning rate is too small while the bit-width is too short.
 
-\begin{figure}[tb]
+\begin{figure*}[tb]
   \centering
   \includegraphics[width=1.0\columnwidth]{figures/fixed_train_exp.pdf}
   \caption{Accuracy curve of different training evaluation when quantization and pruning are applied at different stages. The number for each curve denotes the number of normal training epochs and baseline denotes a training without quantization and pruning. }
   \label{fig:fixed_train_exp}
-\end{figure}
+\end{figure*}
 
 \input{tables/resource_util.tex}
 
