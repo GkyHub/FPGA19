@@ -1,7 +1,7 @@
 \section{Hardware Friendly Training}\label{sec:training}
 In this section, we introduce our hardware-friendly training method using fixed point data and advanced pruning. The whole training process includes the following steps:
 \begin{itemize}
-  \item Train the model with full-precision activations, weights, gradients and errors.
+  \item Train the model with full-precision activations, weights, gradients, and errors.
   \item Prune the model. 
   \item Apply quantization to activations, weights, gradients and errors according to the last epoch of training.  
   \item Continue training the pruned model with fixed-point activations, weights, gradients and errors.

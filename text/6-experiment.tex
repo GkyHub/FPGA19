@@ -1,12 +1,12 @@
 \section{Experiment}\label{sec:experiment}
-In this section, we first evaluate the proposed training process on real dataset. Then we show the hardware experimental results. 
+In this section, we first evaluate the proposed training process on the real dataset. Then we show the hardware experimental results. 
 
 \subsection{Evaluation of Training}
 We first evaluate the proposed training method with a software version implemented with Tensorflow. We use the VGG-11 model~\cite{simonyan2014very} on CIFAR-10 dataset for evaluation. The model consists of 8 convolution layers and 3 fully connected layers. We first test pruning the model after different normal training epochs. We train the model with floating point data and saves checkpoints after every 30 epochs. The saved checkpoints are pruned using the method in section~\ref{sec:training:prune}. The results are shown in Figure~\ref{fig:prune_exp}. The ratio of pruned weights does not vary greatly through the process of normal training. In general, most of the layers can be pruned to 40\% or less of the original size. This brings great potential of acceleration if hardware supports sparsity well.
 
 \begin{figure}[tb]
   \centering
-  \includegraphics[width=1.0\columnwidth]{figures/pruning_exp.pdf}
+  \includegraphics[width=0.9\columnwidth]{figures/pruning_exp.pdf}
   \caption{Ratio of pruned weights after different numbers of normal training epochs. }
   \label{fig:prune_exp}
 \end{figure}
@@ -24,19 +24,9 @@ Then we test training the pruned models with different weight buffer sizes. We f
 
 \subsection{Effect of Workload Imbalance}\label{sec:exp:imb}
 
-Before evaluating the hardware performance, we first analyze the theoretical performance loss brought by workload imbalance. As introduced in section~\ref{sec:hw_unroll}, unroll parameters are limited by loop dimension variety and sparsity. As we cannot group the PEs for fully connected layers, we only compare on the convolutional layers. The normalized speed on the convolutional layers of each configuration is shown in Table~\ref{tab:hw_util}.
+Before evaluating the hardware performance, we first analyze the theoretical performance loss brought by workload imbalance. As introduced in section~\ref{sec:hw_unroll}, unroll parameters are limited by loop dimension variety and sparsity. As we cannot group the PEs for fully connected layers, we only compare on the convolutional layers. The normalized speed on the convolutional layers of each configuration is shown in Table~\ref{tab:hw_util}. We see that using 32 PEs for this network will suffer from $7\%$ performance loss compared with the ideal case where no workload imbalance occurs. Group each 4 PEs together brings about $5\%$ performance increase. 
 
 \input{tables/pe_util.tex}
-
-\begin{figure}[tb]
-  \centering
-  \includegraphics[width=1.0\columnwidth]{figures/util_real.png}
-  \caption{Theoretical utilization ratio for each layer over the number of PEs.}
-  \label{fig:util_real}
-\end{figure}
-
-Here, we see that using 32 PEs for this network will suffer from $7\%$ performance loss compared with the ideal case where no workload imbalance occurs. Group each 4 PEs together brings about $5\%$ performance increase. 
-
 
 \subsection{Hardware Performance}
 A prototype design is implemented on a Xilinx XCKU115 chip with 2 on-board DDR4 SDRAM. In this system, feature map, neuron and their gradients are all of 8-bit and stored in DDR0. Network weights, each of which includes 8-bit weight for computation and extra 16-bit buffer, are stored in DDR1. Corresponding index for sparse representation are stored in DDR0 using \{y[3:0], x[3:0]\} format. This means the the maximum weights block size can be $16\times 16$. The system operates at 200MHz. Each $2\times 2$ PEs are grouped together for CONV layers. We simulate the performance of each layer in each training step with the DDR model and controller from Xilinx IP. Detailed running time and performance are shown in Table~\ref{tab:layerperformance}.
@@ -53,7 +43,7 @@ The last few layers also suffers greatly from a limited bandwidth. On the one ha
 
 A performance and energy efficiency comparison is with state-of-the-art neural network inference/training accelerators and GPU training result is shown in Table~\ref{tab:perf_compare}. The GPU used for comparison is GTX Titan X GM200. Although GPU achieves about 2x speed compared with FPGA, the FPGA part only consumes 1/5 power compared with GPU and achieves 3x energy efficiency. The proposed accelerator achieves much higher energy efficiency compared with the designs~\cite{liu2017fpga, zhao2016f} using floating point data.
 
-The performance of the proposed design is still not as good as FPDeep~\cite{geng2018fpdeep}. This may be caused by two reasons. The first reason is that FPDeep use plain 16-bit fixed point data for training. The proposed design is mainly limited by memory system because of the large weight buffer used for accumulation. FPDeep also stores all the weights of convolution layers on-chip by using multiple FPGAs. The second reason is that FPDeep designs computation kernels for each layer independently, which leads to high utilization ratio. This shows that scaling down FPDeep is hard. We will also explore ways to scale up the proposed design in the future.
+The performance of the proposed design is still not as good as FPDeep~\cite{geng2018fpdeep}. This may be caused by two reasons. The first reason is that FPDeep use stores all the weights of convolution layers on-chip by using multiple FPGAs. The proposed design in this paper is limited by memory system as can be seen from Table~\ref{tab:hw_util} and Table~\ref{tab:layerperformance}. The second reason is that FPDeep designs computation kernels for each layer independently, which leads to high utilization ratio. This shows that scaling down FPDeep is hard. We will also explore ways to scale up the proposed design in the future.
 
 
 
