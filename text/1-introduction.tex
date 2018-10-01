@@ -10,11 +10,14 @@ The first challenge lies in the optimization of training. Existing work \cite{ha
 
 The second challenge lies in hardware design for processing sparse network training. Existing accelerator designs implements sparse matrix-vector multiplication kernels to skip the zero multipliers in sparse models. We refer to this kind of sparsity as operator-sparse pattern. In the back-propagation phase of training, utilizing sparsity means to avoid computing gradients for those already pruned parameters, which introduce the result-sparse pattern. Error propagation also requires the transposition of a sparse parameter matrix, bringing difficulty in accessing data efficiently from external memory. No existing designs support result-sparse pattern and sparse matrix transposition.
 
+The third challenge lies in the great variety between the loop dimensions of forward and backward process of CNNs. Traditional fixed loop unrolling strategy may suffer from severe performance loss. 
+
 In this work, we address the above two challenges with the following contributions:
 
 \begin{itemize}
   \item We propose a hardware friendly training process with advanced quantization and pruning. Specially, we explore the effect of when to apply quantization and pruning with real tasks.
   \item We design dedicated processing elements (PEs) on FPGA to support both operator-sparse and result-sparse patterns. The sparse matrix transposition function is supported by specific scheduling method with a novel data organization in external memory.
+  \item We design configurable loop mapping strategy for both forward and backward CNN computation. 
   \item We evaluate a prototype system on FPGA to show the effectiveness of the design. Experimental results show that the proposed accelerator achieves 641GOP/s equivalent performance and 3x better energy efficiency compared with GPU.
 \end{itemize}
 

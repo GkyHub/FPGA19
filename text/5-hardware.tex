@@ -54,7 +54,7 @@ There is already much discussions on how to unroll the loops on hardware for CNN
 
 {\bf{Layer}}. Parallelize the process of different layers means pipeline different layers. For CNN training, the result of processing one mini-batch is necessary for the next one. So implementing a long pipeline will cause large overhead between the process of adjacent mini-batches.
 
-{\bf{Input/output channel}}. The unroll parameter in these two dimensions are limited by network sparsity. This is caused by workload imbalance. For example, for a CONV layer, unroll the output channel with $M$ means splitting the workload to $M$ different hardware units to process in parallel. Because the network is kernel-level sparse, the number of 2-d convolution kernels for each hardware unit to process may different. We do experiments to show how the parallelism affects the hardware utilization ratio as shown in Figure~\ref{fig:util_sim}. In Figure~\ref{fig:util_sim} (a), we suggest that the parameters are uniformly distributed with the density of $30\%$ and varies the size of parameter. It is clear to see that to keep the utilization ratio, we should choose smaller parallelism for a smaller parameter size. In Figure~\ref{fig:util_sim} (b), we keep the parameter size and changes the sparsity. For parameters with less non-zero values, we need to use a smaller parallelism to get the same hardware utilization ratio.
+{\bf{Input/output channel}}. The unroll parameter in these two dimensions are limited by network sparsity. This is caused by workload imbalance. For example, for a CONV layer, unroll the output channel with $M$ means splitting the workload to $M$ different hardware units to process in parallel. Because the network is kernel-level sparse, the number of 2-d convolution kernels for each hardware unit to process may different. We do experiments to show how the parallelism affects the hardware utilization ratio as shown in Figure~\ref{fig:util_sim}. In Figure~\ref{fig:util_sim} (a), we suggest that the parameters are uniformly distributed with the density of $30\%$ and varies the size of parameter. It is clear to see that to keep the utilization ratio, we should choose smaller parallelism for a smaller parameter size. In Figure~\ref{fig:util_sim} (b), we keep the parameter size and changes the sparsity. For parameters with less non-zero values, we need to use a smaller parallelism to get the same hardware utilization ratio. 
 
 {\bf{Feature map}}. Unrolling in feature map means computing multiple output feature map pixels in parallel. If the output of 2-d convolution is comparable or even smaller than the unroll factor, there will be hardware overhead. For training of CONV layers, the WG steps can be expressed as the 2-d convolution of the input feature map with the gradient of the output feature map. The convolution output size is the same as the convolution kernel, which can be as small as $3\times 3$. So the unroll factor should be carefully chosen.
 
@@ -67,19 +67,24 @@ There is already much discussions on how to unroll the loops on hardware for CNN
   \label{fig:mmap}
 \end{figure*}
 
-So we choose to unroll batch and not implement layer pipeline. Each PE implements $b$ MAC units to process $b$ inputs in parallel. To reduce the channel level parallelism, we explore the possibility of unrolling feature map and convolution kernel dimension in CONV layers. We propose a configurable unroll method between these two dimension. 
-
-For FP and EB steps, we let each $m$ PEs compute $m$ output pixels of a same feature map in parallel. To save on-chip buffer, we split the feature map to $m$ PEs and enables data sharing among them with multiplexers. An example of a $2\times 2$ convolution on a $3\times 3$ feature map with 4PEs are shown in Figure~\ref{fig:mmap}(a). In each cycle, all the PEs fetch the same convolution kernel, multiplies it with a pixel and locally accumulate the result. After 4 cycles, the convolution is done. Note that except for the first cycle, no PE fetches data from its own buffer, which is enabled by data sharing.
-
-For WG step, we let each $m$ PEs fetches $m$ different convolution kernels (in this step is the feature map gradient) and accumulate the result for a same output pixel in parallel. This example is shown in Figure~\ref{fig:mmap}(b). The result are added together when data is written back to external memory. 
-
-\subsection{Data Organization}
 \begin{figure*}[htb]
   \centering
   \includegraphics[width=2.0\columnwidth]{figures/csb.pdf}
   \caption{Example of different sparse matrix store formats for structured sparse convolution kernels. (a) Compressed Sparse Column(CSC) (b) Compressed Sparse Block(CSB)}
   \label{fig:csb}
 \end{figure*}
+
+So we choose to unroll batch and not implement layer pipeline. Each PE implements $b$ MAC units to process $b$ inputs in parallel. To reduce the channel level parallelism, we explore the possibility of unrolling feature map and convolution kernel dimension in CONV layers. We propose a configurable unroll method between these two dimension. 
+
+For FP and EB phases of CONV layers, we let each $m$ PEs compute $m$ output pixels of a same feature map in parallel. To save on-chip buffer, we split the feature map to $m$ PEs and enables data sharing among them with multiplexers. An example of a $2\times 2$ convolution on a $3\times 3$ feature map with 4PEs are shown in Figure~\ref{fig:mmap}(a). In each cycle, all the PEs fetch the same convolution kernel, multiplies it with a pixel and locally accumulate the result. After 4 cycles, the convolution is done. Note that except for the first cycle, no PE fetches data from its own buffer, which is enabled by data sharing. We simulate the effect of PE groups size on a pruned VGG-11 model, which is shown in Table~\ref{tab:hw_util}. As can be seen, $2\times 2$ group already increase the theoretical utilization to 93\%, which means larger group sizes can bring limited performance improvement. 
+
+\input{tables/pe_util.tex}
+
+For WG step, we let each $m$ PEs fetches $m$ different convolution kernels (in this step is the feature map gradient) and accumulate the result for a same output pixel in parallel. This example is shown in Figure~\ref{fig:mmap}(b). The result are added together when data is written back to external memory. 
+
+We simulate the workload imbalance effect on designs with different number of PEs as shown in Figure~\ref{fig:util_sim} (c). We simulate on a real pruned VGG-11 network. As can be seen from the curves, except for the first and last layer of the network, most layers still shows over 90\% utilization ratio with 32 PEs.
+
+\subsection{Data Organization}
 
 First, we use the compressed sparse block (CSB) data format~\cite{bulucc2009parallel} for the sparse weight storage. The sparse weight For fully connected layer, the inference phase and back propagation phase needs to access the parameter matrix in the original version and a transposed version. For convolutional layer, this is similar if we treat the weights as a 2-D matrix of 2-D convolution kernels. The commonly adopted CSC format, as shown in Figure~\ref{fig:csb}(a) stores data column by column, thus leads to the difficulty in row major access. The CSB format stores the elements block by block. In this format, the access direction can be controlled by changing the access order of blocks. This format also fit with the hardware's block-wise process behavior as introduced in section~\ref{sec:hw_pe}. Since the transpose of a single block is achieved in PE level, we can access the sparse weights in both original and transposed format.
 
