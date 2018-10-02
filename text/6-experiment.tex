@@ -23,7 +23,7 @@ Then we test training the pruned models with different weight buffer sizes. We f
 \input{tables/resource_util.tex}
 
 \subsection{Hardware Performance}
-A prototype design is implemented on the Xilinx KCU1500 development board, with 4 independent DDR. In this system, feature map, neuron and their gradients are all of 8-bit and stored in DDR0. Network weights, each of which includes 8-bit weight for computation and extra 16-bit buffer, are stored in DDR1. Corresponding index for sparse representation are stored in DDR0 using \{y[3:0], x[3:0]\} format. This means the the maximum weights block size can be $16\times 16$. The system operates at 200MHz. Each $2\times 2$ PEs are grouped together for CONV layers. We simulate the performance of each layer in each training step with the DDR model and controller from Xilinx IP. Detailed running time and performance are shown in Table~\ref{tab:layerperformance}.
+A prototype design is implemented on the Xilinx KCU1500 development board, with 4 independent DDR. In this system, feature map, neuron and their gradients are all of 8-bit and stored in DDR0. Network weights, each of which includes 8-bit weight for computation and extra 16-bit buffer, are stored in DDR1. Corresponding index for sparse representation are stored in DDR0 using \{y[3:0], x[3:0]\} format. This means the the maximum weights block size can be $16\times 16$. The system operates at 250MHz. Each $2\times 2$ PEs are grouped together for CONV layers. We simulate the performance of each layer in each training step with the DDR model and controller from Xilinx IP. Detailed running time and performance are shown in Table~\ref{tab:layerperformance}. The power cost of the design is estimated by Vivado 2017.4. 
 
 \input{tables/breakdown.tex}
 
