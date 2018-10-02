@@ -3,7 +3,7 @@
     \centering
     %\footnotesize
     \caption{The performance of each layer. \textit{Comp.} indicates the complexity of each layer. \textit{Perf.} indicates the performance of running each layer on our hardware. \textit{Bound type} indicates the performance of each layer is bounded with bandwidth (B) or computation (C).}
-    \begin{tabular}{c|c|cccc|cccc|cccc}  \hline
+    \begin{tabular}{c|c|cccc|cccc|cccc}  \toprule
         &       & \multicolumn{4}{c|}{Forward Pass (FP)}  & \multicolumn{4}{c|}{Error Backpropagation (EB)} & \multicolumn{4}{c}{Weight Gradient (WG)} \\
   \cline{2-14}layer & Comp. & Time  & Perf. & bound & Utilize & Time  & Perf. & bound & Utilize & Time  & Perf. & bound & Utilize \\
         & (GOP) & (us)  & (GOP/s) & type  & rate  & (us)  & (GOP/s) & type  & rate  & (us)  & (GOP/s) & type  & rate \\
@@ -21,7 +21,7 @@
   dense8 & 0.003  & 75    & 4.4   & B     & 0.1\% & 74    & 4.4   & B     & 0.1\% & 272   & 1.2   & B     & 0.02\% \\
   \hline
   total & 9.81  & 10931  & 897.5  & -     & -     & 10988  & 892.8  & -     & -     & 23993  & 408.9  & -     & - \\
-  \hline
+  \bottomrule
   \end{tabular}%
     \label{tab:layerperformance}%
   \end{table*}%

@@ -1,0 +1,143 @@
+2018-10-01 11,08,32.864743, Epoch 1, (average) loss, 1.139, (average) top1 accuracy, 94.18 ,, (average) top5 accuracy, 99.31 ,. 0.002 sec/batch
+
+2018-10-01 11,09,34.921398, Epoch 2, (average) loss, 1.096, (average) top1 accuracy, 94.35 ,, (average) top5 accuracy, 99.28 ,. 0.001 sec/batch
+
+2018-10-01 11,10,36.838483, Epoch 3, (average) loss, 1.078, (average) top1 accuracy, 94.30 ,, (average) top5 accuracy, 99.23 ,. 0.001 sec/batch
+
+2018-10-01 11,11,38.383240, Epoch 4, (average) loss, 1.064, (average) top1 accuracy, 94.30 ,, (average) top5 accuracy, 99.28 ,. 0.001 sec/batch
+
+2018-10-01 11,12,39.779707, Epoch 5, (average) loss, 1.055, (average) top1 accuracy, 94.14 ,, (average) top5 accuracy, 99.27 ,. 0.001 sec/batch
+
+	Test, loss, 1.12991332836, top1 accuracy, 87.67 ,, top5 accuracy, 96.975160 ,.
+
+2018-10-01 11,13,44.413734, Epoch 6, (average) loss, 1.049, (average) top1 accuracy, 94.12 ,, (average) top5 accuracy, 99.23 ,. 0.001 sec/batch
+
+2018-10-01 11,14,46.130672, Epoch 7, (average) loss, 1.045, (average) top1 accuracy, 93.94 ,, (average) top5 accuracy, 99.18 ,. 0.001 sec/batch
+
+2018-10-01 11,15,47.680439, Epoch 8, (average) loss, 1.039, (average) top1 accuracy, 93.90 ,, (average) top5 accuracy, 99.19 ,. 0.001 sec/batch
+
+2018-10-01 11,16,49.352965, Epoch 9, (average) loss, 1.034, (average) top1 accuracy, 93.99 ,, (average) top5 accuracy, 99.20 ,. 0.001 sec/batch
+
+2018-10-01 11,17,50.880998, Epoch 10, (average) loss, 1.032, (average) top1 accuracy, 93.81 ,, (average) top5 accuracy, 99.19 ,. 0.001 sec/batch
+
+	Test, loss, 1.10616788707, top1 accuracy, 87.78 ,, top5 accuracy, 97.265625 ,.
+
+2018-10-01 11,18,55.442852, Epoch 11, (average) loss, 1.028, (average) top1 accuracy, 93.81 ,, (average) top5 accuracy, 99.20 ,. 0.001 sec/batch
+
+2018-10-01 11,19,57.192023, Epoch 12, (average) loss, 1.024, (average) top1 accuracy, 93.87 ,, (average) top5 accuracy, 99.22 ,. 0.001 sec/batch
+
+2018-10-01 11,20,59.627147, Epoch 13, (average) loss, 1.022, (average) top1 accuracy, 93.87 ,, (average) top5 accuracy, 99.14 ,. 0.001 sec/batch
+
+2018-10-01 11,22,01.414269, Epoch 14, (average) loss, 1.020, (average) top1 accuracy, 93.65 ,, (average) top5 accuracy, 99.21 ,. 0.001 sec/batch
+
+2018-10-01 11,23,03.708693, Epoch 15, (average) loss, 1.017, (average) top1 accuracy, 93.82 ,, (average) top5 accuracy, 99.19 ,. 0.001 sec/batch
+
+	Test, loss, 1.09365472198, top1 accuracy, 87.86 ,, top5 accuracy, 97.265625 ,.
+
+2018-10-01 11,24,08.138725, Epoch 16, (average) loss, 1.015, (average) top1 accuracy, 93.73 ,, (average) top5 accuracy, 99.19 ,. 0.001 sec/batch
+
+2018-10-01 11,25,09.637152, Epoch 17, (average) loss, 1.014, (average) top1 accuracy, 93.66 ,, (average) top5 accuracy, 99.22 ,. 0.001 sec/batch
+
+2018-10-01 11,26,11.379447, Epoch 18, (average) loss, 1.010, (average) top1 accuracy, 93.78 ,, (average) top5 accuracy, 99.21 ,. 0.001 sec/batch
+
+2018-10-01 11,27,12.851241, Epoch 19, (average) loss, 1.008, (average) top1 accuracy, 93.84 ,, (average) top5 accuracy, 99.24 ,. 0.001 sec/batch
+
+2018-10-01 11,28,14.589751, Epoch 20, (average) loss, 1.007, (average) top1 accuracy, 93.68 ,, (average) top5 accuracy, 99.22 ,. 0.001 sec/batch
+
+	Test, loss, 1.08385072572, top1 accuracy, 87.98 ,, top5 accuracy, 97.405849 ,.
+
+2018-10-01 11,29,19.134731, Epoch 21, (average) loss, 1.002, (average) top1 accuracy, 93.96 ,, (average) top5 accuracy, 99.20 ,. 0.001 sec/batch
+
+2018-10-01 11,30,20.686760, Epoch 22, (average) loss, 1.003, (average) top1 accuracy, 93.88 ,, (average) top5 accuracy, 99.24 ,. 0.001 sec/batch
+
+2018-10-01 11,31,23.013427, Epoch 23, (average) loss, 1.002, (average) top1 accuracy, 93.88 ,, (average) top5 accuracy, 99.20 ,. 0.001 sec/batch
+
+2018-10-01 11,32,25.069136, Epoch 24, (average) loss, 1.000, (average) top1 accuracy, 93.82 ,, (average) top5 accuracy, 99.23 ,. 0.001 sec/batch
+
+2018-10-01 11,33,27.213305, Epoch 25, (average) loss, 0.999, (average) top1 accuracy, 93.95 ,, (average) top5 accuracy, 99.20 ,. 0.001 sec/batch
+
+	Test, loss, 1.07672618062, top1 accuracy, 87.99 ,, top5 accuracy, 97.506010 ,.
+
+2018-10-01 11,34,32.234986, Epoch 26, (average) loss, 0.996, (average) top1 accuracy, 93.97 ,, (average) top5 accuracy, 99.18 ,. 0.001 sec/batch
+
+2018-10-01 11,35,34.135064, Epoch 27, (average) loss, 0.996, (average) top1 accuracy, 93.81 ,, (average) top5 accuracy, 99.25 ,. 0.001 sec/batch
+
+2018-10-01 11,36,36.098098, Epoch 28, (average) loss, 0.994, (average) top1 accuracy, 93.88 ,, (average) top5 accuracy, 99.27 ,. 0.001 sec/batch
+
+2018-10-01 11,37,38.006721, Epoch 29, (average) loss, 0.993, (average) top1 accuracy, 93.87 ,, (average) top5 accuracy, 99.27 ,. 0.001 sec/batch
+
+2018-10-01 11,38,40.044942, Epoch 30, (average) loss, 0.991, (average) top1 accuracy, 93.98 ,, (average) top5 accuracy, 99.24 ,. 0.001 sec/batch
+
+	Test, loss, 1.0698854715, top1 accuracy, 88.10 ,, top5 accuracy, 97.646234 ,.
+
+2018-10-01 11,39,45.355391, Epoch 31, (average) loss, 0.989, (average) top1 accuracy, 94.01 ,, (average) top5 accuracy, 99.30 ,. 0.001 sec/batch
+
+2018-10-01 11,40,47.651712, Epoch 32, (average) loss, 0.989, (average) top1 accuracy, 94.03 ,, (average) top5 accuracy, 99.24 ,. 0.001 sec/batch
+
+2018-10-01 11,41,49.713349, Epoch 33, (average) loss, 0.989, (average) top1 accuracy, 94.02 ,, (average) top5 accuracy, 99.31 ,. 0.001 sec/batch
+
+2018-10-01 11,42,50.504042, Epoch 34, (average) loss, 0.987, (average) top1 accuracy, 94.00 ,, (average) top5 accuracy, 99.34 ,. 0.001 sec/batch
+
+2018-10-01 11,43,52.699479, Epoch 35, (average) loss, 0.987, (average) top1 accuracy, 94.11 ,, (average) top5 accuracy, 99.27 ,. 0.001 sec/batch
+
+	Test, loss, 1.06674168488, top1 accuracy, 88.17 ,, top5 accuracy, 97.746394 ,.
+
+2018-10-01 11,44,57.724372, Epoch 36, (average) loss, 0.986, (average) top1 accuracy, 93.98 ,, (average) top5 accuracy, 99.28 ,. 0.001 sec/batch
+
+2018-10-01 11,45,57.990903, Epoch 37, (average) loss, 0.985, (average) top1 accuracy, 94.01 ,, (average) top5 accuracy, 99.27 ,. 0.001 sec/batch
+
+2018-10-01 11,46,58.658203, Epoch 38, (average) loss, 0.984, (average) top1 accuracy, 94.13 ,, (average) top5 accuracy, 99.30 ,. 0.001 sec/batch
+
+2018-10-01 11,48,00.023776, Epoch 39, (average) loss, 0.983, (average) top1 accuracy, 94.16 ,, (average) top5 accuracy, 99.36 ,. 0.001 sec/batch
+
+2018-10-01 11,49,01.574728, Epoch 40, (average) loss, 0.982, (average) top1 accuracy, 94.11 ,, (average) top5 accuracy, 99.37 ,. 0.001 sec/batch
+
+	Test, loss, 1.06376764446, top1 accuracy, 88.21 ,, top5 accuracy, 97.796474 ,.
+
+2018-10-01 11,50,06.968391, Epoch 41, (average) loss, 0.980, (average) top1 accuracy, 94.19 ,, (average) top5 accuracy, 99.43 ,. 0.001 sec/batch
+
+2018-10-01 11,51,08.466937, Epoch 42, (average) loss, 0.983, (average) top1 accuracy, 94.11 ,, (average) top5 accuracy, 99.32 ,. 0.001 sec/batch
+
+2018-10-01 11,52,11.589374, Epoch 43, (average) loss, 0.983, (average) top1 accuracy, 94.08 ,, (average) top5 accuracy, 99.28 ,. 0.001 sec/batch
+
+2018-10-01 11,53,13.617751, Epoch 44, (average) loss, 0.979, (average) top1 accuracy, 94.17 ,, (average) top5 accuracy, 99.34 ,. 0.001 sec/batch
+
+2018-10-01 11,54,15.911848, Epoch 45, (average) loss, 0.980, (average) top1 accuracy, 94.14 ,, (average) top5 accuracy, 99.34 ,. 0.001 sec/batch
+
+	Test, loss, 1.06167475631, top1 accuracy, 88.28 ,, top5 accuracy, 97.856571 ,.
+
+2018-10-01 11,55,21.168729, Epoch 46, (average) loss, 0.978, (average) top1 accuracy, 94.31 ,, (average) top5 accuracy, 99.33 ,. 0.001 sec/batch
+
+2018-10-01 11,56,23.293056, Epoch 47, (average) loss, 0.978, (average) top1 accuracy, 94.25 ,, (average) top5 accuracy, 99.33 ,. 0.001 sec/batch
+
+2018-10-01 11,57,25.154690, Epoch 48, (average) loss, 0.977, (average) top1 accuracy, 94.26 ,, (average) top5 accuracy, 99.37 ,. 0.001 sec/batch
+
+2018-10-01 11,58,27.445794, Epoch 49, (average) loss, 0.978, (average) top1 accuracy, 94.25 ,, (average) top5 accuracy, 99.36 ,. 0.001 sec/batch
+
+2018-10-01 11,59,29.807960, Epoch 50, (average) loss, 0.977, (average) top1 accuracy, 94.29 ,, (average) top5 accuracy, 99.39 ,. 0.001 sec/batch
+
+	Test, loss, 1.05891893537, top1 accuracy, 88.36 ,, top5 accuracy, 97.946715 ,.
+
+2018-10-01 12,00,35.002014, Epoch 51, (average) loss, 0.976, (average) top1 accuracy, 94.23 ,, (average) top5 accuracy, 99.35 ,. 0.001 sec/batch
+
+2018-10-01 12,01,36.729569, Epoch 52, (average) loss, 0.976, (average) top1 accuracy, 94.29 ,, (average) top5 accuracy, 99.35 ,. 0.001 sec/batch
+
+2018-10-01 12,02,39.439990, Epoch 53, (average) loss, 0.974, (average) top1 accuracy, 94.38 ,, (average) top5 accuracy, 99.38 ,. 0.001 sec/batch
+
+2018-10-01 12,03,41.307044, Epoch 54, (average) loss, 0.973, (average) top1 accuracy, 94.34 ,, (average) top5 accuracy, 99.37 ,. 0.001 sec/batch
+
+2018-10-01 12,04,43.126316, Epoch 55, (average) loss, 0.973, (average) top1 accuracy, 94.30 ,, (average) top5 accuracy, 99.42 ,. 0.001 sec/batch
+
+	Test, loss, 1.05649383825, top1 accuracy, 88.38 ,, top5 accuracy, 97.936699 ,.
+
+2018-10-01 12,05,48.649746, Epoch 56, (average) loss, 0.974, (average) top1 accuracy, 94.34 ,, (average) top5 accuracy, 99.39 ,. 0.001 sec/batch
+
+2018-10-01 12,06,51.053750, Epoch 57, (average) loss, 0.974, (average) top1 accuracy, 94.33 ,, (average) top5 accuracy, 99.37 ,. 0.001 sec/batch
+
+2018-10-01 12,07,53.812862, Epoch 58, (average) loss, 0.972, (average) top1 accuracy, 94.31 ,, (average) top5 accuracy, 99.40 ,. 0.001 sec/batch
+
+2018-10-01 12,08,55.879300, Epoch 59, (average) loss, 0.971, (average) top1 accuracy, 94.44 ,, (average) top5 accuracy, 99.44 ,. 0.001 sec/batch
+
+2018-10-01 12,09,57.585575, Epoch 60, (average) loss, 0.971, (average) top1 accuracy, 94.37 ,, (average) top5 accuracy, 99.44 ,. 0.001 sec/batch
+
+	Test, loss, 1.05475752705, top1 accuracy, 88.35 ,, top5 accuracy, 97.986779 ,.

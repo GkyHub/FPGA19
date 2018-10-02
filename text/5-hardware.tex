@@ -24,6 +24,18 @@ To fully take advantage of the sparse weights in training, the hardware should s
 \item {\bf Result-sparse}: For WG steps, the activations are multiplied with the back propagated errors to get the weight gradients. Both the operators of multiplication are dense but the result is sparse.
 \end{itemize}
 
+We choose to process the sparse computation in a block-wise manner. In this manner, the hardware can support both of the sparse operation types efficiently. An example of a $4\times 4$ block of fully connected layer executed in a PE is shown in Figure~\ref{fig:spmv}. Each weight matrix element is stored with its relative 2-D position in the block. Each time a pair of index $(x, y)$ is fetched from the index buffer. For inference, as shown in Figure~\ref{fig:spmv}(a), $x$ is used to access the activations in data buffer and $y$ is used to access the results. To calculate the gradients of the sparse parameters, data buffer and parameter buffer store the activation of two adjacent layers. $x$ and $y$ are used to access the buffers respectively. Different PEs work independently on different blocks for higher parallelism.
+
+Note that for the case in Figure~\ref{fig:spmv}(a), changing the order of indexes will not change the result, as long as the order of indexes corresponds to that of the parameters. This property is also true for Figure~\ref{fig:spmv}(b). So in EB step, when we need to use a transpose format of the weight matrix as suggested in Section~\ref{sec:preliminary}, we only need to exchange $x$ and $y$ with a hardware multiplexer and do not need to change the data format in external memory. 
+
+For CONV layers, as the sparsity is 2-d kernel level structured, the same sparsity is also supplied. If we replace the entries in the matrix with 2-d convolution kernels, each element in vector as a feature map, and scalar multiplication with 2-d convolution, the above example becomes a CONV layer example.
+
+The structure of each PE is shown in Figure~\ref{fig:arch}(b). Similar to the example in Figure~\ref{fig:spmv}, we implement {\bf{data buf}} for activations, {\bf{weight buf}} for weights(convolution kernels) and {\bf{res buf}} for activations with on-chip RAM. {\bf{data buf}} and {\bf{weight buf}} are in simple dual port mode and works in a ping-pong manner by splitting the address space. {\bf{res buf}} is implemented with two simple dual port RAMs because accumulation function requires extra RD/WR port. We implement the address generation unit(AGU) to support the computation pattern. AGU implements {\bf{XBuf}} and {\bf{YBuf}} to store the relative index of each weights or convolution kernel within a processing block. For the buffers to be randomly accessed, the X and Y index read from index buffer directly serve as the high bits of RAM addresses, which help to select the channel or neuron to use. An index independent counter helps generate the address sequence to carry out 2-d convolution for CONV layer or scaler multiplication for FC layer. For the buffer to be sequentially accessed, another counter is used generate address sequence.
+
+\subsection{Loop Unrolling Strategy}\label{sec:hw_unroll}
+
+There is already much discussions on how to unroll the loops on hardware for CNN inference with dense models~\cite{zhang2015optimizing,mao2017exploring}. For CNN training, the loops of the back propagation phase is similar to that of the inference phase. But the loop dimension varies greatly between the FP and BP phases. For example, if a convolutional layer does $3\times 3$ convolution on $224\times 224$ feature maps with 1 padding, computing the gradient of these convolution kernels needs $224\times 224$ convolutions on $224\times 224$ feature maps with 1 padding. according to equation \ref{eqt:wg_conv}. This causes great varieties in convolution kernel sizes and convolution result sizes and thus limits the loop unrolling design. Introducing sparsity further limits the choice of loop unrolling parameters. We analyze different unroll dimensions in this section to decide the hardware design strategy.
+
 \begin{figure*}[htbp] 
   \centering
   \includegraphics[width=1.8\columnwidth]{figures/sparse_mv.pdf}
@@ -31,24 +43,12 @@ To fully take advantage of the sparse weights in training, the hardware should s
   \label{fig:spmv}
 \end{figure*}
 
-We choose to process the sparse computation in a block-wise manner. In this manner, the hardware can support both of the sparse operation types efficiently. An example of a $4\times 4$ block of fully connected layer executed in a PE is shown in Figure~\ref{fig:spmv}. Each weight matrix element is stored with its relative 2-D position in the block. Each time a pair of index $(x, y)$ is fetched from the index buffer. For inference, as shown in Figure~\ref{fig:spmv}(a), $x$ is used to access the activations in data buffer and $y$ is used to access the results. To calculate the gradients of the sparse parameters, data buffer and parameter buffer store the activation of two adjacent layers. $x$ and $y$ are used to access the buffers respectively. Different PEs work independently on different blocks for higher parallelism.
-
-Note that for the case in Figure~\ref{fig:spmv}(a), changing the order of indexes will not change the result, as long as the order of indexes corresponds to that of the parameters. This property is also true for Figure~\ref{fig:spmv}(b). So in EB step, when we need to use a transpose format of the weight matrix as suggested in Section~\ref{sec:preliminary}, we only need to exchange $x$ and $y$ with a hardware multiplexer and do not need to change the data format in external memory. 
-
-For CONV layers, as the sparsity is 2-d kernel level structured, the same sparsity is also supplied. If we replace the entries in the matrix with 2-d convolution kernels, each element in vector as a feature map, and scalar multiplication with 2-d convolution, the above example becomes a CONV layer example.
-
 \begin{figure*}[t]
   \centering
   \includegraphics[width=1.8\columnwidth]{figures/utilization.pdf}
   \caption{Hardware utilization ratio under different sizes of sparse parameters, sparsity, and PE numbers. (a) Estimation with a fixed sparsity and different parameter scales. (b) Estimation with a fixed parameter size and different sparsities. (c) Simulation on a real pruned VGG-11 model with different PE numbers.}
   \label{fig:util_sim}
 \end{figure*}
-
-The structure of each PE is shown in Figure~\ref{fig:arch}(b). Similar to the example in Figure~\ref{fig:spmv}, we implement {\bf{data buf}} for activations, {\bf{weight buf}} for weights(convolution kernels) and {\bf{res buf}} for activations with on-chip RAM. {\bf{data buf}} and {\bf{weight buf}} are in simple dual port mode and works in a ping-pong manner by splitting the address space. {\bf{res buf}} is implemented with two simple dual port RAMs because accumulation function requires extra RD/WR port. We implement the address generation unit(AGU) to support the computation pattern. AGU implements {\bf{XBuf}} and {\bf{YBuf}} to store the relative index of each weights or convolution kernel within a processing block. For the buffers to be randomly accessed, the X and Y index read from index buffer directly serve as the high bits of RAM addresses, which help to select the channel or neuron to use. An index independent counter helps generate the address sequence to carry out 2-d convolution for CONV layer or scaler multiplication for FC layer. For the buffer to be sequentially accessed, another counter is used generate address sequence.
-
-\subsection{Loop Unrolling Strategy}\label{sec:hw_unroll}
-
-There is already much discussions on how to unroll the loops on hardware for CNN inference with dense models~\cite{zhang2015optimizing,mao2017exploring}. But for back propagation and sparse model, the strategy should be different. We analyze different unroll dimensions in this section to decide the hardware design strategy.
 
 {\bf{Batch}}. Parallelism in batch dimension will not affect hardware design compared with inference accelerator. For training, usually a mini-batch is used in each iteration. So parallelism in batch is always preferred.
 
@@ -59,6 +59,18 @@ There is already much discussions on how to unroll the loops on hardware for CNN
 {\bf{Feature map}}. Unrolling in feature map means computing multiple output feature map pixels in parallel. If the output of 2-d convolution is comparable or even smaller than the unroll factor, there will be hardware overhead. For training of CONV layers, the WG steps can be expressed as the 2-d convolution of the input feature map with the gradient of the output feature map. The convolution output size is the same as the convolution kernel, which can be as small as $3\times 3$. So the unroll factor should be carefully chosen.
 
 {\bf{Convolution kernel}}. Unrolling convolution kernel dimension is faced with the same problem as that of unrolling feature map, not in WG steps, but in FP and EB steps. So the unroll factor should be carefully chosen.
+
+
+
+So we choose to unroll batch and not implement layer pipeline. Each PE implements $b$ MAC units to process $b$ inputs in parallel. To reduce the channel level parallelism, we explore the possibility of unrolling feature map and convolution kernel dimension in CONV layers. We propose a configurable unroll method between these two dimension. 
+
+For FP and EB phases of CONV layers, we let each $m$ PEs compute $m$ output pixels of a same feature map in parallel. To save on-chip buffer, we split the feature map to $m$ PEs and enables data sharing among them with multiplexers. An example of a $2\times 2$ convolution on a $3\times 3$ feature map with 4PEs are shown in Figure~\ref{fig:mmap}(a). In each cycle, all the PEs fetch the same convolution kernel, multiplies it with a pixel and locally accumulate the result. After 4 cycles, the convolution is done. Note that except for the first cycle, no PE fetches data from its own buffer, which is enabled by data sharing. We simulate the effect of PE groups size on a pruned VGG-11 model, which is shown in Table~\ref{tab:hw_util}. As can be seen, $2\times 2$ group already increase the theoretical utilization to 93\%, which means larger group sizes can bring limited performance improvement. 
+
+\input{tables/pe_util.tex}
+
+For WG step, we let each $m$ PEs fetches $m$ different convolution kernels (in this step is the feature map gradient) and accumulate the result for a same output pixel in parallel. This example is shown in Figure~\ref{fig:mmap}(b). The result are added together when data is written back to external memory. 
+
+We simulate the workload imbalance effect on designs with different number of PEs as shown in Figure~\ref{fig:util_sim} (c). We simulate on a real pruned VGG-11 network. As can be seen from the curves, except for the first and last layer of the network, most layers still shows over 90\% utilization ratio with 32 PEs.
 
 \begin{figure*}[t]
   \centering
@@ -74,21 +86,13 @@ There is already much discussions on how to unroll the loops on hardware for CNN
   \label{fig:csb}
 \end{figure*}
 
-So we choose to unroll batch and not implement layer pipeline. Each PE implements $b$ MAC units to process $b$ inputs in parallel. To reduce the channel level parallelism, we explore the possibility of unrolling feature map and convolution kernel dimension in CONV layers. We propose a configurable unroll method between these two dimension. 
-
-For FP and EB phases of CONV layers, we let each $m$ PEs compute $m$ output pixels of a same feature map in parallel. To save on-chip buffer, we split the feature map to $m$ PEs and enables data sharing among them with multiplexers. An example of a $2\times 2$ convolution on a $3\times 3$ feature map with 4PEs are shown in Figure~\ref{fig:mmap}(a). In each cycle, all the PEs fetch the same convolution kernel, multiplies it with a pixel and locally accumulate the result. After 4 cycles, the convolution is done. Note that except for the first cycle, no PE fetches data from its own buffer, which is enabled by data sharing. We simulate the effect of PE groups size on a pruned VGG-11 model, which is shown in Table~\ref{tab:hw_util}. As can be seen, $2\times 2$ group already increase the theoretical utilization to 93\%, which means larger group sizes can bring limited performance improvement. 
-
-\input{tables/pe_util.tex}
-
-For WG step, we let each $m$ PEs fetches $m$ different convolution kernels (in this step is the feature map gradient) and accumulate the result for a same output pixel in parallel. This example is shown in Figure~\ref{fig:mmap}(b). The result are added together when data is written back to external memory. 
-
-We simulate the workload imbalance effect on designs with different number of PEs as shown in Figure~\ref{fig:util_sim} (c). We simulate on a real pruned VGG-11 network. As can be seen from the curves, except for the first and last layer of the network, most layers still shows over 90\% utilization ratio with 32 PEs.
-
 \subsection{Data Organization}
 
 First, we use the compressed sparse block (CSB) data format~\cite{bulucc2009parallel} for the sparse weight storage. The sparse weight For fully connected layer, the inference phase and back propagation phase needs to access the parameter matrix in the original version and a transposed version. For convolutional layer, this is similar if we treat the weights as a 2-D matrix of 2-D convolution kernels. The commonly adopted CSC format, as shown in Figure~\ref{fig:csb}(a) stores data column by column, thus leads to the difficulty in row major access. The CSB format stores the elements block by block. In this format, the access direction can be controlled by changing the access order of blocks. This format also fit with the hardware's block-wise process behavior as introduced in section~\ref{sec:hw_pe}. Since the transpose of a single block is achieved in PE level, we can access the sparse weights in both original and transposed format.
 
 Second, we increase the access continuity of feature map by using a $(CHWC_mN)$ storage format. As introduced above, we process the channels in a block manner, and we always process the batch in parallel. So we store a batch of a same pixel continuously. Then, we store each $d$ channels of this pixel together. $d$ is chosen the same as the corresponding convolution kernel block size of this layer. This requires that the output channel block size of one layer should be the same as the input channel block size of the next. So the memory access burst can reach $d*N*p$ where $p$ is the width to be processed each time, limited by on-chip buffer size and image width. 
+
+
 
 \subsection{Scheduling Strategy}
 
